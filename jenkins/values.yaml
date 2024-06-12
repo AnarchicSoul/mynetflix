@@ -403,6 +403,7 @@ controller:
     - sonar:2.17.2
     - aqua-security-scanner:3.2.5
     - kubernetes-cli:1.12.1
+    - keycloak:2.3.2
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies

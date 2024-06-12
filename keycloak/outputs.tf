@@ -1,3 +1,3 @@
-output "jenkinspass" {
+output "keycloakpass" {
     value = nonsensitive(var.password)
 }

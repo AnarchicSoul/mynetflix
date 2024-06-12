@@ -1,3 +1,6 @@
+output "keycloakpass" {
+    value = module.keycloak.keycloakpass
+}
 output "jenkinspass" {
     value = module.jenkins.jenkinspass
 }

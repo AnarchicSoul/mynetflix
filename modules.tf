@@ -5,3 +5,7 @@ module "k8s_cluster" {
 module "jenkins" {
     source = "./jenkins"
 }
+
+module "keycloak" {
+    source = "./keycloak"
+}

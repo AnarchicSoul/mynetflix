@@ -2,19 +2,17 @@
 # HELM INSTALL
 #######################################################################################
 
-resource "helm_release" "jenkins" {
-  name       = "jenkins"
+resource "helm_release" "keycloak" {
+  name       = "keycloak"
   namespace  = module.k8s_cluster.namespace
-#  repository = "https://charts.jenkins.io"
-  chart      = "./jenkins/jenkins-5.2.0.tgz"
-  version    = "5.2.0"
+  chart      = "./keycloak/keycloak-21.4.1.tgz"
 
   values = [
-    "${file("./jenkins/values.yaml")}"
+    "${file("./keycloak/values.yaml")}"
   ]
 
   set {
-      name  = "controller.admin.password"
+      name  = "auth.adminPassword"
       value = var.password
     }
   
