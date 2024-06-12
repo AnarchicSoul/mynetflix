@@ -16,6 +16,5 @@ required_version = ">= 0.14.0"
 }
 
 provider "kubernetes" {
-  config_path    = "/home/administrator/.kube/config.03.2024"
-  config_context = "docker-desktop"
+  config_path    = "./kubeconfig"
 }
