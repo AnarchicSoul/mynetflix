@@ -11,22 +11,9 @@ required_version = ">= 0.14.0"
       name = "mynetflix"
     }
   }
-  required_providers {
-    helm = {
-      source = "hashicorp/helm"
-      version = "2.8.0"
-    }
-  }
 }
 
-provider "helm" {
-  kubernetes {
-    config_path    = "/home/administrator/.kube/config.03.2024"
-    config_context = "docker-desktop"
-  }
-}
-
-module "k8s_cluster" {
-    source = "k8s-cluster"
+module "jenkins" {
+    source = "jenkins"
 }
 
