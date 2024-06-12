@@ -1,1 +1,1 @@
-{"Modules":[{"Key":"jenkins","Source":"./jenkins","Dir":"jenkins"},{"Key":"jenkins.k8s_cluster","Source":"../k8s-cluster","Dir":"k8s-cluster"},{"Key":"","Source":"","Dir":"."}]}
+{"Modules":[{"Key":"jenkins","Source":"./jenkins","Dir":"jenkins"},{"Key":"jenkins.k8s_cluster","Source":"../k8s-cluster","Dir":"k8s-cluster"},{"Key":"k8s_cluster","Source":"./k8s-cluster","Dir":"k8s-cluster"},{"Key":"","Source":"","Dir":"."}]}

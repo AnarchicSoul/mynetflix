@@ -1,12 +1,6 @@
 # Define required providers
 terraform {
 required_version = ">= 0.14.0"
-  cloud {
-    organization = "johanduval"
-    workspaces {
-      name = "mynetflix"
-    }
-  }
   required_providers {
     kubernetes = {
       source = "hashicorp/kubernetes"
@@ -15,6 +9,8 @@ required_version = ">= 0.14.0"
   }
 }
 
+
 provider "kubernetes" {
-  config_path    = "./kubeconfig"
+  config_path    = "./k8s-cluster/kubeconfig"
 }
+

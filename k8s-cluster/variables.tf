@@ -1,3 +1,3 @@
 variable "namespace" {
-  default = "valm1"
+  default = "devops-tools"
 }  

@@ -8,12 +8,7 @@ required_version = ">= 0.14.0"
   cloud {
     organization = "johanduval"
     workspaces {
-      name = "mynetflix"
+      name = "master"
     }
   }
 }
-
-module "jenkins" {
-    source = "./jenkins"
-}
-
