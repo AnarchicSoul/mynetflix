@@ -1,1 +1,25 @@
-test
+Test to deploy secure infra
+
+deploy jenkins:
+    Source: https://www.jenkins.io/doc/book/installing/kubernetes/
+    # git clone https://github.com/scriptcamp/kubernetes-jenkins
+    kubectl create namespace devops-tools
+    # kubectl apply -f kubernetes-jenkins/volume.yaml
+    # kubectl apply -f kubernetes-jenkins/serviceAccount.yaml
+    helm repo add jenkinsci https://charts.jenkins.io
+    helm repo update
+    # helm pull jenkinsci/jenkins
+    helm install jenkins -n devops-tools -f values.yaml jenkins-5.2.0.tgz
+
+
+
+idea:
+UI = give movie name (or series)
+API = LF DB website available + sort list of movies available
+UI = show list, if download accepted go api
+API = GET or POST download API
+API = if series store good folder for netflix
+use jenkins pipe for api and ui dev
+protect api with apim and ui with keyckloak
+
+check istio ? 
