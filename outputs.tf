@@ -1,6 +1,9 @@
 output "keycloakpass" {
   value = var.keycloak ? module.keycloak[0].keycloakpass : null
 }
+output "superadminpass" {
+  value = var.keycloak ? module.keycloak[0].superadmin : null
+}
 output "jenkinspass" {
   value = var.jenkins ? module.jenkins[0].jenkinspass : null
 }

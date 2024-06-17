@@ -9,7 +9,8 @@ resource "helm_release" "prom_stack" {
   version    = "60.1.0"
 
   values = [
-    "${file("./prometheus/values.yaml")}"
+    "${file("./prometheus/values.yaml")}",
+    var.keycloak ? local.keycloak_config : local.nokeycloak_config
   ]
 
   set {
@@ -39,4 +40,27 @@ resource "null_resource" "execute_sh" {
   provisioner "local-exec" {
     command = "kubectl --kubeconfig ./k8s-cluster/kubeconfig patch ds promstack-prometheus-node-exporter --type \"json\" -p '[{\"op\": \"remove\", \"path\" : \"/spec/template/spec/containers/0/volumeMounts/2/mountPropagation\"}]' -n toto"
   }
+}
+
+locals {
+  keycloak_config = <<-EOT
+    grafana:
+      grafana.ini:
+        auth.generic_oauth:
+          enabled: true
+          name: Keycloak-OAuth
+          allow_sign_up: true
+          client_id: grafana
+          scopes: openid email profile roles
+          auth_url: http://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/auth
+          token_url: http://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/token
+          api_url: https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo
+          redirect_uri: http://${var.grafana_ingress}/login/generic_oauth
+          role_attribute_path: contains(realm_access.roles[*], 'admin') && 'Admin' || contains(realm_access.roles[*], 'editor') && 'Editor' || 'Viewer'
+        server:
+          root_url: http://${var.grafana_ingress}/
+  EOT
+  nokeycloak_config = <<-EOT
+    nameOverride: ""
+  EOT
 }

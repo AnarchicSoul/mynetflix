@@ -7,6 +7,9 @@ variable "alert_ingress" {
 variable "grafana_ingress" {
     type        = string
 }  
+variable "keycloak_ingress" {
+    type        = string
+}  
 variable "password" {
     type        = string
 }  
@@ -16,3 +19,6 @@ variable "namespace" {
 variable "docker_desktop" {
     type = bool
 }  
+variable "keycloak" {
+    type        = bool
+} 

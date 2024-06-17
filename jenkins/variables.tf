@@ -7,3 +7,9 @@ variable "namespace" {
 variable "jenkins_ingress" {
     type        = string
 }  
+variable "keycloak_ingress" {
+    type        = string
+}  
+variable "keycloak" {
+    type        = bool
+} 

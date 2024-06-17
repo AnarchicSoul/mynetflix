@@ -46,6 +46,13 @@ variable "keycloak_password" {
     # remove default if you want secure password 
     default     = "admin"
 }  
+variable "superadmin" {
+    description = "Type keycloak superadmin password who will access all applications"
+    type        = string
+    sensitive   = true
+    # remove default if you want secure password 
+    default     = "superadmin"
+}  
 variable "keycloak_ingress" {
     description = "Type keycloak ingress"
     type        = string
@@ -68,5 +75,5 @@ variable "jenkins_password" {
 variable "jenkins_ingress" {
     description = "Type jenkins ingress"
     type        = string
-    default     = "jenkinss.localhost"
+    default     = "jenkins.localhost"
 }  

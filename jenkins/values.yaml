@@ -512,20 +512,20 @@ controller:
     configUrls: []
     # - https://acme.org/jenkins.yaml
     # -- List of Jenkins Config as Code scripts
-    configScripts:
-      keycloak: |
-        jenkins:
-          securityRealm:
-            keycloak:
-              keycloakJson: |-
-                {
-                  "realm": "realm1",
-                  "auth-server-url": "http://keycloak/",
-                  "ssl-required": "external",
-                  "resource": "jenkins",
-                  "public-client": true,
-                  "confidential-port": 0
-                }
+    configScripts: {}
+#      keycloak: |
+#        jenkins:
+#          securityRealm:
+#            keycloak:
+#              keycloakJson: |-
+#                {
+#                  "realm": "realm1",
+#                  "auth-server-url": "http://keycloak/",
+#                  "ssl-required": "external",
+#                  "resource": "jenkins",
+#                  "public-client": true,
+#                  "confidential-port": 0
+#                }
 
     # Allows adding to the top-level security JCasC section. For legacy purposes, by default, the chart includes apiToken configurations
     # -- Jenkins Config as Code security-section
