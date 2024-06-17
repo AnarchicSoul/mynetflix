@@ -63,7 +63,7 @@ variable "keycloak_ingress" {
 variable "jenkins" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = true
+    default     = false
 }  
 variable "jenkins_password" {
     description = "Type jenkins password"

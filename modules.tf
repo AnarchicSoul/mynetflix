@@ -44,3 +44,8 @@ module "jenkins" {
     depends_on = [module.keycloak]
 }
 
+module "oauth" {
+    source = "./oauth2"
+    namespace  = module.k8s_cluster.namespace
+    depends_on = [module.keycloak]
+}
