@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: keycloak
+  namespace: toto
+spec:
+  endpoints:
+    - interval: 30s
+      path: /realms/master/metrics
+      port: metrics
+  namespaceSelector:
+    matchNames:
+      - toto
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: keycloak
+      app.kubernetes.io/instance: keycloak
+      app.kubernetes.io/name: keycloak

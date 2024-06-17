@@ -4,7 +4,7 @@
 
 resource "helm_release" "keycloak" {
   name       = "keycloak"
-  namespace  = module.k8s_cluster.namespace
+  namespace  = var.namespace
   chart      = "./keycloak/keycloak-21.4.1.tgz"
 
   values = [
@@ -14,6 +14,10 @@ resource "helm_release" "keycloak" {
   set {
       name  = "auth.adminPassword"
       value = var.password
+    }
+  set {
+      name  = "ingress.hostname"
+      value = var.keycloak_ingress
     }
   
 } 

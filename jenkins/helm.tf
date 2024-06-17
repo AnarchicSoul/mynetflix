@@ -4,8 +4,7 @@
 
 resource "helm_release" "jenkins" {
   name       = "jenkins"
-  namespace  = module.k8s_cluster.namespace
-#  repository = "https://charts.jenkins.io"
+  namespace  = var.namespace
   chart      = "./jenkins/jenkins-5.2.0.tgz"
   version    = "5.2.0"
 
@@ -16,6 +15,10 @@ resource "helm_release" "jenkins" {
   set {
       name  = "controller.admin.password"
       value = var.password
+    }
+  set {
+      name  = "controller.ingress.hostName"
+      value = var.jenkins_ingress
     }
   
 } 

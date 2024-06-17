@@ -1,3 +1,3 @@
 variable "namespace" {
-  default = "devops-tools"
+  type  = string
 }  

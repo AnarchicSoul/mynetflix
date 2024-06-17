@@ -969,7 +969,7 @@ metrics:
   ## @param metrics.enabled Enable exposing Keycloak statistics
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/keycloak#enabling-statistics
   ##
-  enabled: false
+  enabled: true
   ## Keycloak metrics service parameters
   ##
   service:
@@ -981,6 +981,7 @@ metrics:
     ##
     annotations:
       prometheus.io/scrape: "true"
+      prometheus.io/path: "/realms/master/metrics"
       prometheus.io/port: "{{ .Values.metrics.service.ports.http }}"
     ## @param metrics.service.extraPorts [array] Add additional ports to the keycloak metrics service (i.e. admin port 9000)
     ##
@@ -990,15 +991,15 @@ metrics:
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
     ##
-    enabled: false
+    enabled: true
     ## @param metrics.serviceMonitor.port Metrics service HTTP port
     ##
     port: http
     ## @param metrics.serviceMonitor.endpoints [array] The endpoint configuration of the ServiceMonitor. Path is mandatory. Interval, timeout and labellings can be overwritten.
     ##
     endpoints:
-      - path: '{{ include "keycloak.httpPath" . }}metrics'
       - path: '{{ include "keycloak.httpPath" . }}realms/master/metrics'
+      - path: '{{ include "keycloak.httpPath" . }}metrics'
     ## @param metrics.serviceMonitor.path Metrics service HTTP path. Deprecated: Use @param metrics.serviceMonitor.endpoints instead
     ##
     path: ""
@@ -1037,7 +1038,7 @@ metrics:
   prometheusRule:
     ## @param metrics.prometheusRule.enabled Create PrometheusRule Resource for scraping metrics using PrometheusOperator
     ##
-    enabled: false
+    enabled: true
     ## @param metrics.prometheusRule.namespace Namespace which Prometheus is running in
     ##
     namespace: ""
@@ -1066,7 +1067,7 @@ metrics:
 keycloakConfigCli:
   ## @param keycloakConfigCli.enabled Whether to enable keycloak-config-cli job
   ##
-  enabled: false
+  enabled: true
   ## Bitnami keycloak-config-cli image
   ## ref: https://hub.docker.com/r/bitnami/keycloak-config-cli/tags/
   ## @param keycloakConfigCli.image.registry [default: REGISTRY_NAME] keycloak-config-cli container image registry
@@ -1232,21 +1233,216 @@ keycloakConfigCli:
   ##       - name: portname
   ##         containerPort: 1234
   ##
-  sidecars: []
+  sidecars: 
   ## @param keycloakConfigCli.configuration keycloak-config-cli realms configuration
   ## NOTE: nil keys will be considered files to import locally
   ## Example:
-  ## configuration:
-  ##   realm1.json: |
-  ##     {
-  ##       "realm": "realm1",
-  ##       "clients": []
-  ##     }
-  ##   realm2.yaml: |
-  ##     realm: realm2
-  ##     clients: []
-  ##
-  configuration: {}
+   #configuration:
+  configuration: 
+    realm1.json: |
+        {
+          "realm": "realm1",
+          "enabled": true,
+          "clients": [
+            {
+              "clientId": "grafana",
+              "name": "grafana",
+              "description": "",
+              "rootUrl": "http://grafana.localhost",
+              "adminUrl": "http://grafana.localhost",
+              "baseUrl": "",
+              "surrogateAuthRequired": false,
+              "enabled": true,
+              "alwaysDisplayInConsole": false,
+              "clientAuthenticatorType": "client-secret",
+              "redirectUris": [
+                "http://grafana.localhost/login/generic_oauth"
+              ],
+              "webOrigins": [
+                "http://grafana.localhost"
+              ],
+              "notBefore": 0,
+              "bearerOnly": false,
+              "consentRequired": false,
+              "standardFlowEnabled": true,
+              "implicitFlowEnabled": false,
+              "directAccessGrantsEnabled": true,
+              "serviceAccountsEnabled": false,
+              "publicClient": true,
+              "frontchannelLogout": true,
+              "protocol": "openid-connect",
+              "attributes": {
+                "client.secret.creation.time": "1718635809",
+                "login_theme": "keycloak",
+                "oauth2.device.authorization.grant.enabled": "false",
+                "backchannel.logout.revoke.offline.tokens": "false",
+                "use.refresh.tokens": "true",
+                "oidc.ciba.grant.enabled": "false",
+                "client.use.lightweight.access.token.enabled": "false",
+                "backchannel.logout.session.required": "true",
+                "client_credentials.use_refresh_token": "false",
+                "acr.loa.map": "{}",
+                "require.pushed.authorization.requests": "false",
+                "tls.client.certificate.bound.access.tokens": "false",
+                "display.on.consent.screen": "false",
+                "token.response.type.bearer.lower-case": "false"
+              },
+              "authenticationFlowBindingOverrides": {},
+              "fullScopeAllowed": true,
+              "nodeReRegistrationTimeout": -1,
+              "protocolMappers": [
+                {
+                  "name": "realm roles",
+                  "protocol": "openid-connect",
+                  "protocolMapper": "oidc-usermodel-realm-role-mapper",
+                  "consentRequired": false,
+                  "config": {
+                    "introspection.token.claim": "true",
+                    "multivalued": "true",
+                    "userinfo.token.claim": "true",
+                    "user.attribute": "foo",
+                    "id.token.claim": "true",
+                    "lightweight.claim": "false",
+                    "access.token.claim": "true",
+                    "claim.name": "realm_access.roles",
+                    "jsonType.label": "String"
+                  }
+                },
+                {
+                  "name": "Client Host",
+                  "protocol": "openid-connect",
+                  "protocolMapper": "oidc-usersessionmodel-note-mapper",
+                  "consentRequired": false,
+                  "config": {
+                    "user.session.note": "clientHost",
+                    "introspection.token.claim": "true",
+                    "id.token.claim": "true",
+                    "access.token.claim": "true",
+                    "claim.name": "clientHost",
+                    "jsonType.label": "String"
+                  }
+                },
+                {
+                  "name": "Client ID",
+                  "protocol": "openid-connect",
+                  "protocolMapper": "oidc-usersessionmodel-note-mapper",
+                  "consentRequired": false,
+                  "config": {
+                    "user.session.note": "client_id",
+                    "introspection.token.claim": "true",
+                    "id.token.claim": "true",
+                    "access.token.claim": "true",
+                    "claim.name": "client_id",
+                    "jsonType.label": "String"
+                  }
+                },
+                {
+                  "name": "Client IP Address",
+                  "protocol": "openid-connect",
+                  "protocolMapper": "oidc-usersessionmodel-note-mapper",
+                  "consentRequired": false,
+                  "config": {
+                    "user.session.note": "clientAddress",
+                    "introspection.token.claim": "true",
+                    "id.token.claim": "true",
+                    "access.token.claim": "true",
+                    "claim.name": "clientAddress",
+                    "jsonType.label": "String"
+                  }
+                }
+              ],
+              "defaultClientScopes": [
+                "web-origins",
+                "acr",
+                "profile",
+                "roles",
+                "email"
+              ],
+              "optionalClientScopes": [
+                "address",
+                "phone",
+                "offline_access",
+                "microprofile-jwt"
+              ],
+              "access": {
+                "view": true,
+                "configure": true,
+                "manage": true
+              }
+            },
+            {
+              "clientId": "jenkins",
+              "name": "",
+              "description": "",
+              "rootUrl": "http://jenkinss.localhost/",
+              "adminUrl": "http://jenkinss.localhost/",
+              "baseUrl": "",
+              "surrogateAuthRequired": false,
+              "enabled": true,
+              "alwaysDisplayInConsole": false,
+              "clientAuthenticatorType": "client-secret",
+              "redirectUris": [
+                "http://jenkinss.localhost/*"
+              ],
+              "webOrigins": [
+                "http://jenkinss.localhost"
+              ],
+              "notBefore": 0,
+              "bearerOnly": false,
+              "consentRequired": false,
+              "standardFlowEnabled": true,
+              "implicitFlowEnabled": false,
+              "directAccessGrantsEnabled": true,
+              "serviceAccountsEnabled": false,
+              "publicClient": true,
+              "frontchannelLogout": true,
+              "protocol": "openid-connect",
+              "attributes": {
+                "oidc.ciba.grant.enabled": "false",
+                "oauth2.device.authorization.grant.enabled": "false",
+                "backchannel.logout.session.required": "true",
+                "backchannel.logout.revoke.offline.tokens": "false"
+              },
+              "authenticationFlowBindingOverrides": {},
+              "fullScopeAllowed": true,
+              "nodeReRegistrationTimeout": -1,
+              "defaultClientScopes": [
+                "web-origins",
+                "acr",
+                "roles",
+                "profile",
+                "email"
+              ],
+              "optionalClientScopes": [
+                "address",
+                "phone",
+                "offline_access",
+                "microprofile-jwt"
+              ],
+              "access": {
+                "view": true,
+                "configure": true,
+                "manage": true
+              }
+            }
+          ],
+          "users": [
+            {
+              "username": "admin",
+              "enabled": true,
+              "emailVerified": true,
+              "firstName": "Rootus",
+              "lastName": "Adminus",
+              "email": "local-admin@mail.com",
+              "credentials": [
+                {
+                  "type": "password",
+                  "value": "admin"
+                }
+              ]
+            }
+          ]
+        }
   ## @param keycloakConfigCli.existingConfigmap ConfigMap with keycloak-config-cli configuration
   ## NOTE: This will override keycloakConfigCli.configuration
   ##

@@ -1,6 +1,5 @@
-#data "kubernetes_service_v1" "rke2-ingress-nginx-controller" {
-#  metadata {
-#    name = "rke2-ingress-nginx-controller"
-#    namespace = "kube-system"
-#  }
-#}
+resource "kubernetes_namespace_v1" "example" {
+  metadata {
+    name = var.namespace
+  }
+}

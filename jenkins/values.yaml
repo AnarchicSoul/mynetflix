@@ -404,6 +404,7 @@ controller:
     - aqua-security-scanner:3.2.5
     - kubernetes-cli:1.12.1
     - keycloak:2.3.2
+    - prometheus:773.v3b_62d8178eec
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
@@ -511,10 +512,20 @@ controller:
     configUrls: []
     # - https://acme.org/jenkins.yaml
     # -- List of Jenkins Config as Code scripts
-    configScripts: {}
-    #  welcome-message: |
-    #    jenkins:
-    #      systemMessage: Welcome to our CI\CD server. This Jenkins is configured and managed 'as code'.
+    configScripts:
+      keycloak: |
+        jenkins:
+          securityRealm:
+            keycloak:
+              keycloakJson: |-
+                {
+                  "realm": "realm1",
+                  "auth-server-url": "http://keycloak/",
+                  "ssl-required": "external",
+                  "resource": "jenkins",
+                  "public-client": true,
+                  "confidential-port": 0
+                }
 
     # Allows adding to the top-level security JCasC section. For legacy purposes, by default, the chart includes apiToken configurations
     # -- Jenkins Config as Code security-section
@@ -782,7 +793,7 @@ controller:
     # -- Additional labels to add to the service monitor object
     serviceMonitorAdditionalLabels: {}
     # -- Set a custom namespace where to deploy ServiceMonitor resource
-    serviceMonitorNamespace: lens-metrics
+    #serviceMonitorNamespace: lens-metrics
     # -- How often prometheus should scrape metrics
     scrapeInterval: 60s
 

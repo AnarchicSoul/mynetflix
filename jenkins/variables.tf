@@ -1,6 +1,9 @@
 variable "password" {
-    description = "Type jenkins password"
     type        = string
-    sensitive   = true
-    default     = "admin"
+}  
+variable "namespace" {
+    type = string
+}  
+variable "jenkins_ingress" {
+    type        = string
 }  

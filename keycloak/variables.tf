@@ -1,6 +1,9 @@
 variable "password" {
-    description = "Type keycloak password"
     type        = string
-    sensitive   = true
-    default     = "admin"
+}  
+variable "namespace" {
+    type = string
+}  
+variable "keycloak_ingress" {
+    type        = string
 }  

@@ -23,3 +23,10 @@ use jenkins pipe for api and ui dev
 protect api with apim and ui with keyckloak
 
 check istio ? 
+
+prometheus:
+  prometheusSpec:
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
