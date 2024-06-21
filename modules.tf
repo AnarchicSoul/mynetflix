@@ -8,6 +8,12 @@ module "nginxoss" {
     depends_on = [module.k8s_cluster]
 }
 
+module "certmgr" {
+    source = "./cert-manager"
+    namespace  = module.k8s_cluster.namespace
+    depends_on = [module.k8s_cluster]
+}
+
 module "prometheus" {
     source = "./prometheus"
     namespace  = module.k8s_cluster.namespace

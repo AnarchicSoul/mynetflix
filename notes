@@ -1,29 +1,40 @@
-Test to deploy secure infra
+- deploy nginx
+- deploy cert-manager
+- deploy prometheus
+- deploy keycloak
+  -- connect keycloak with prometheus 
+- deploy jenkins
+  -- connect jenkins with keycloak 
+- deploy oauth2-proxy
+  -- connect oauth2-proxy with keycloak
+  -- protect prometheus and alertmanager UI with oauth2-proxy
+- deploy argocd
+- deploy harbor
+  -- connect harbor with keycloak
+- deploy myapp
+  -- using jenkins 
+  -- using argocd 
+  -- storing in harbor
+  -- scan trivy
+- deploy gravitee
+  -- protect myapp with gravitee and 
+  -- create swagger
+- deploy sonarqube
+  -- scan myapp 
+- deploy kubeshark
+- deploy plex or netflix
+- deploy homer
+  -- protect with oauth2-proxy
+- --> idea:
+  UI = give movie name (or series)
+  API = LF DB website available + sort list of movies available
+  UI = show list, if download accepted go api
+  API = GET or POST download API
+  API = if series store good folder for netflix
+  use jenkins pipe for api and ui dev
+  protect api with apim and ui with keyckloak
 
-deploy jenkins:
-    Source: https://www.jenkins.io/doc/book/installing/kubernetes/
-    # git clone https://github.com/scriptcamp/kubernetes-jenkins
-    kubectl create namespace devops-tools
-    # kubectl apply -f kubernetes-jenkins/volume.yaml
-    # kubectl apply -f kubernetes-jenkins/serviceAccount.yaml
-    helm repo add jenkinsci https://charts.jenkins.io
-    helm repo update
-    # helm pull jenkinsci/jenkins
-    helm install jenkins -n devops-tools -f values.yaml jenkins-5.2.0.tgz
-
-
-
-idea:
-UI = give movie name (or series)
-API = LF DB website available + sort list of movies available
-UI = show list, if download accepted go api
-API = GET or POST download API
-API = if series store good folder for netflix
-use jenkins pipe for api and ui dev
-protect api with apim and ui with keyckloak
-
-check istio ? 
-
+Note for prom stack work with service monitor...
 prometheus:
   prometheusSpec:
     ruleSelectorNilUsesHelmValues: false
@@ -31,6 +42,18 @@ prometheus:
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
 
+Terraform arbo: 
 ∟
 ∟
     ∟
+
+│ Warning: Helm uninstall returned an information message
+│ 
+│ These resources were kept due to the resource policy:
+│ [CustomResourceDefinition] certificaterequests.cert-manager.io
+│ [CustomResourceDefinition] certificates.cert-manager.io
+│ [CustomResourceDefinition] challenges.acme.cert-manager.io
+│ [CustomResourceDefinition] clusterissuers.cert-manager.io
+│ [CustomResourceDefinition] issuers.cert-manager.io
+│ [CustomResourceDefinition] orders.acme.cert-manager.io
+│ 

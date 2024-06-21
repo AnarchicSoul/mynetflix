@@ -37,7 +37,7 @@ variable "prometheus_ingress" {
 variable "keycloak" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = true
+    default     = false
 } 
 variable "keycloak_password" {
     description = "Type keycloak password"
