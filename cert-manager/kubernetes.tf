@@ -1,3 +1,16 @@
+resource "kubernetes_secret" "jks" {
+  metadata {
+    name = "jks-password-secret"
+    namespace = "${var.namespace}"
+  }
+  
+  data = {
+    password-key = "tatayoyo"
+    tls-keystore-password = "tatayoyo"
+    tls-truststore-password = "tatayoyo"
+  }
+}
+
 resource "kubernetes_manifest" "cluster_self_issuer" {
   manifest = yamldecode(<<-EOF
     apiVersion: cert-manager.io/v1
@@ -8,6 +21,7 @@ resource "kubernetes_manifest" "cluster_self_issuer" {
       selfSigned: {}
     EOF
   )
+  depends_on = [kubernetes_secret.jks]
 }
 
 resource "kubernetes_manifest" "certificate_ca" {
@@ -27,9 +41,16 @@ resource "kubernetes_manifest" "certificate_ca" {
       issuerRef:
         kind: ClusterIssuer
         name: localsvc-issuer
+      keystores:
+        jks:
+          create: true
+          passwordSecretRef:
+            key: password-key
+            name: jks-password-secret
     EOF
   )
-  depends_on = [kubernetes_manifest.cluster_self_issuer]
+  depends_on = [
+    kubernetes_manifest.cluster_self_issuer]
 }
 
 resource "kubernetes_manifest" "final_issuer" {
@@ -58,7 +79,7 @@ resource "kubernetes_manifest" "certificate_wildcard" {
       isCA: false
       dnsNames:
         - "*.${var.namespace}.svc.cluster.local"
-        - "*.localhost"
+        - "*.${var.mydomain}"
       subject:
         organizations:
           - quickstart
@@ -69,6 +90,12 @@ resource "kubernetes_manifest" "certificate_wildcard" {
       issuerRef:
         kind: Issuer
         name: test-issuer
+      keystores:
+        jks:
+          create: true
+          passwordSecretRef:
+            key: password-key
+            name: jks-password-secret
       secretName: wildcard-cert
     EOF
   )

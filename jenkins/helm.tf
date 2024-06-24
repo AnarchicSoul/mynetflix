@@ -26,6 +26,11 @@ resource "helm_release" "jenkins" {
 locals {
   keycloak_config = <<-EOT
     controller:
+      ingress:
+        tls: 
+          - secretName: wildcard-cert
+            hosts:
+            - ${var.jenkins_ingress}
       JCasC:
         configScripts:
           keycloak: |
@@ -35,7 +40,7 @@ locals {
                   keycloakJson: |-
                     {
                       "realm": "realm1",
-                      "auth-server-url": "http://${var.keycloak_ingress}/",
+                      "auth-server-url": "https://${var.keycloak_ingress}/",
                       "ssl-required": "external",
                       "resource": "jenkins",
                       "public-client": true,

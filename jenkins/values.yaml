@@ -153,7 +153,9 @@ controller:
 
   # Set min/max heap here if needed with "-Xms512m -Xmx512m"
   # -- Append to `JAVA_OPTS` env var
-  javaOpts:
+  javaOpts: >-
+    -Djavax.net.ssl.trustStore=/usr/local/share/ca-certificates/truststore.jks
+    -Djavax.net.ssl.trustStorePassword=tatayoyo
   # -- Append to `JENKINS_OPTS` env var
   jenkinsOpts:
 
@@ -162,7 +164,7 @@ controller:
   # or `http://` depending on the `tls` configuration.
   # The Protocol can be overwritten by specifying `controller.jenkinsUrlProtocol`.
   # -- Set protocol for Jenkins URL; `https` if `controller.ingress.tls`, `http` otherwise
-  jenkinsUrlProtocol:
+  jenkinsUrlProtocol: https
 
   # -- Set Jenkins URL if you are not using the ingress definitions provided by the chart
   jenkinsUrl:
@@ -199,13 +201,17 @@ controller:
   #   supplementalGroups: [1000]
   #   capabilities: {}
   # -- Completely overwrites the contents of the pod security context, ignoring the values provided for `runAsUser`, `fsGroup`, and `securityContextCapabilities`
-  podSecurityContextOverride: ~
+  podSecurityContextOverride: 
+    runAsUser: 0  # Définit l'UID sous lequel Jenkins s'exécute dans le pod
+    runAsNonRoot: false  # Indique que Jenkins s'exécute en tant qu'utilisateur non root
+    supplementalGroups: []  # Groupe supplémentaire pour le volume persistant, si nécessaire
+
 
   # -- Allow controlling the securityContext for the jenkins container
   containerSecurityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    readOnlyRootFilesystem: true
+    runAsUser: 0
+    runAsGroup: 0
+    readOnlyRootFilesystem: false
     allowPrivilegeEscalation: false
 
   # For minikube, set this to NodePort, elsewhere uses LoadBalancer
@@ -1236,15 +1242,15 @@ persistence:
   # -- SubPath for jenkins-home mount
   subPath:
   # -- Additional volumes
-  volumes: []
-  #  - name: nothing
-  #    emptyDir: {}
+  volumes:
+    - name: root-ca-volume
+      secret:
+        secretName: root-ca-svc-secret
 
   # -- Additional mounts
-  mounts: []
-  #  - mountPath: /var/nothing
-  #    name: nothing
-  #    readOnly: true
+  mounts:
+    - mountPath: /usr/local/share/ca-certificates/
+      name: root-ca-volume
 
 networkPolicy:
   # -- Enable the creation of NetworkPolicy resources

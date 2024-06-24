@@ -1,13 +1,36 @@
-## docker_desktop workarround 
+#######################################################################################
+## Base Config
+#######################################################################################
+# Careful if you modify this part, be sure to know your cluster. 
+# Base component can be disabled from install, but be sure they exists ! 
+
+
+## Common config
 variable "docker_desktop" {
+  # docker_desktop workarround 
   type  = bool
   default = true
 }
+locals {
+    mydomain    = "${yamldecode(file("config.yaml")).baseconfig.common.mydomain}"
+}
+
 
 ## Kubernetes config 
-variable "namespace" {
-  default = "toto"
-}  
+variable "certmgr" {
+    description = "enable = true & disable = false"
+    type        = bool
+    default     = true
+} 
+variable "nginxoss" {
+    description = "enable = true & disable = false"
+    type        = bool
+    default     = true
+} 
+locals {
+    namespace    = "${yamldecode(file("config.yaml")).baseconfig.kubernetes.namespace}"
+}
+
 
 ## Kube prometheus stack config
 variable "grafana_password" {
@@ -17,27 +40,21 @@ variable "grafana_password" {
     # remove default if you want secure password 
     default     = "admin"
 }  
-variable "grafana_ingress" {
-    description = "Type grafana ingress"
-    type        = string
-    default     = "grafana.localhost"
-}  
-variable "alert_ingress" {
-    description = "Type grafana ingress"
-    type        = string
-    default     = "alertmanager.localhost"
-}  
-variable "prometheus_ingress" {
-    description = "Type grafana ingress"
-    type        = string
-    default     = "prometheus.localhost"
-}  
+locals {
+    grafana_host = "${yamldecode(file("config.yaml")).baseconfig.prometheus.grafana_host}"
+    alert_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.alertmanager_host}"
+    prometheus_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.prometheus_host}"
+    grafana_ingress = "${local.grafana_host}.${local.mydomain}"
+    alert_ingress = "${local.alert_host}.${local.mydomain}"
+    prometheus_ingress = "${local.prometheus_host}.${local.mydomain}"
+}
+
 
 ## Keycloak Config
 variable "keycloak" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = false
+    default     = true
 } 
 variable "keycloak_password" {
     description = "Type keycloak password"
@@ -53,17 +70,23 @@ variable "superadmin" {
     # remove default if you want secure password 
     default     = "superadmin"
 }  
-variable "keycloak_ingress" {
-    description = "Type keycloak ingress"
-    type        = string
-    default     = "keycloak"
-}  
+locals {
+    keycloak_host = "${yamldecode(file("config.yaml")).baseconfig.keycloak.keycloak_host}"
+    keycloak_ingress = "${local.keycloak_host}${var.docker_desktop ? ".${local.namespace}.svc.cluster.local" : ".${local.mydomain}"}"
+}
+
+
+#######################################################################################
+## Application Config
+#######################################################################################
+# Normally everything should work. :)
+
 
 ## Jenkins Config
 variable "jenkins" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = false
+    default     = true
 }  
 variable "jenkins_password" {
     description = "Type jenkins password"
@@ -72,8 +95,7 @@ variable "jenkins_password" {
     # remove default if you want secure password 
     default     = "admin"
 }  
-variable "jenkins_ingress" {
-    description = "Type jenkins ingress"
-    type        = string
-    default     = "jenkins.localhost"
-}  
+locals {
+    jenkins_host    = "${yamldecode(file("config.yaml")).app.jenkins.jenkins_host}"
+    jenkins_ingress = "${local.jenkins_host}.${local.mydomain}"
+}

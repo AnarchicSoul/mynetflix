@@ -1,0 +1,18 @@
+## Enable or disable a feature should be set in variable.tf
+## Change or remove and type secure default password should be set in variable.tf
+## Show password in output should be set in output.tf with sensitive = false
+baseconfig: 
+  common:
+    mydomain: "localhost"
+  kubernetes:
+    namespace: "toto"
+  prometheus:
+    grafana_host: "grafana"
+    alertmanager_host: "alertmanager"
+    prometheus_host: "prometheus"
+  keycloak:
+    keycloak_host: "keycloak"
+app:
+  jenkins:
+    jenkins_host: "jenkins"
+

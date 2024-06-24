@@ -1,16 +1,14 @@
 module "k8s_cluster" {
     source = "./k8s-cluster"
-    namespace  = var.namespace
-}
-
-module "nginxoss" {
-    source = "./nginxoss"
-    depends_on = [module.k8s_cluster]
+    namespace  = local.namespace
+    certmgr = var.certmgr
+    nginxoss = var.nginxoss
 }
 
 module "certmgr" {
     source = "./cert-manager"
-    namespace  = module.k8s_cluster.namespace
+    namespace = module.k8s_cluster.namespace
+    mydomain = local.mydomain
     depends_on = [module.k8s_cluster]
 }
 
@@ -19,12 +17,12 @@ module "prometheus" {
     namespace  = module.k8s_cluster.namespace
     password  = var.grafana_password
     docker_desktop  = var.docker_desktop
-    prometheus_ingress  = var.prometheus_ingress
-    alert_ingress  = var.alert_ingress
-    grafana_ingress  = var.grafana_ingress
-    keycloak_ingress  = var.keycloak_ingress
+    prometheus_ingress  = local.prometheus_ingress
+    alert_ingress  = local.alert_ingress
+    grafana_ingress  = local.grafana_ingress
+    keycloak_ingress  = local.keycloak_ingress
     keycloak = var.keycloak
-    depends_on = [module.nginxoss]
+    depends_on = [module.certmgr]
 }
 
 module "keycloak" {
@@ -33,9 +31,9 @@ module "keycloak" {
     namespace  = module.k8s_cluster.namespace
     password  = var.keycloak_password
     superadmin  = var.superadmin
-    keycloak_ingress  = var.keycloak_ingress
-    grafana_ingress  = var.grafana_ingress
-    jenkins_ingress  = var.jenkins_ingress
+    keycloak_ingress  = local.keycloak_ingress
+    grafana_ingress  = local.grafana_ingress
+    jenkins_ingress  = local.jenkins_ingress
     depends_on = [module.prometheus]
 }
 
@@ -44,8 +42,8 @@ module "jenkins" {
     source = "./jenkins"
     namespace  = module.k8s_cluster.namespace
     password  = var.jenkins_password
-    jenkins_ingress  = var.jenkins_ingress
-    keycloak_ingress  = var.keycloak_ingress
+    jenkins_ingress  = local.jenkins_ingress
+    keycloak_ingress  = local.keycloak_ingress
     keycloak = var.keycloak
     depends_on = [module.keycloak]
 }

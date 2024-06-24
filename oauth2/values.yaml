@@ -40,6 +40,29 @@ config:
   configFile: |-
     email_domains = [ "*" ]
     upstreams = [ "file:///dev/null" ]
+
+#    # Provider config
+#    provider="keycloak"
+#    provider_display_name="Keycloak"
+#    login_url="https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/auth"
+#    redeem_url="https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/token"
+#    profile_url="https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/userinfo"
+#    validate_url="https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/userinfo"
+#    ssl_insecure_skip_verify=true
+#    cookie_secure="true"
+#    # Upstream config
+#    http_address="0.0.0.0:4180"
+#    # upstreams="file:///dev/null"
+#    upstreams="https://oauth-oauth2-proxy.toto.svc.cluster.local/oauth2/auth"
+#    email_domains=["*"]
+#    oidc_issuer_url="https://keycloak.toto.svc.cluster.local/realms/realm1"
+#    cookie_domains = ["toto.svc.cluster.local, localhost"]
+#    scope="openid"
+#    whitelist_domains = ["*.toto.svc.cluster.local, *.localhost"]
+#    redirect_url="https://oauth-oauth2-proxy.toto.svc.cluster.local/oauth2/callback"
+#    session_cookie_minimal = "false"
+#    cookie_csrf_per_request=true
+
   # Custom configuration file: oauth2_proxy.cfg
   # configFile: |-
   #   pass_basic_auth = false
@@ -83,7 +106,22 @@ image:
 # This will default to 4443 if this value is not set and the httpScheme set to https
 # containerPort: 4180
 
-extraArgs: {}
+extraArgs:
+  provider: keycloak
+  set-xauthrequest: true
+  provider-display-name: Oauth2 Login
+  client-id: prometheus
+  client-secret: z4Ux09d1GrR5GVUMleJVSPwYkDFdiaxZ
+  login-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/auth" 
+  redeem-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/token"
+  profile-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/userinfo" 
+  validate-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/userinfo"
+  ssl-insecure-skip-verify: true
+  scope: openid profile email
+  cookie-secure: "true"
+  upstream: "http://promstack-kube-prometheus-prometheus.toto.svc.cluster.local:9090"
+
+
 extraEnv: []
 
 envFrom: []
@@ -164,7 +202,7 @@ ingress:
   pathType: ImplementationSpecific
   # Used to create an Ingress record.
   hosts:
-    - auth.localhost
+    - prometheus.localhost
   # Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
   # Warning! The configuration is dependant on your current k8s API version capabilities (networking.k8s.io/v1)
   # extraPaths:
@@ -179,11 +217,11 @@ ingress:
   # annotations:
   #   kubernetes.io/ingress.class: nginx
   #   kubernetes.io/tls-acme: "true"
-  # tls:
+  tls:
     # Secrets must be manually created in the namespace.
-    # - secretName: chart-example-tls
-    #   hosts:
-    #     - chart-example.local
+    - secretName: "wildcard-cert"
+      hosts:
+        - prometheus.localhost
 
 resources: {}
   # limits:
