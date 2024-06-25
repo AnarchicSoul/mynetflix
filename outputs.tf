@@ -7,7 +7,7 @@ output "superadminpass" {
   sensitive = true
 }
 output "jenkinspass" {
-  value = var.jenkins ? module.jenkins[0].jenkinspass : null
+  value = var.jenkins ? module.devpack[0].jenkinspass : null
   sensitive = true
 }
 output "grafanapass" {

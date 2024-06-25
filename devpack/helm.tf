@@ -3,13 +3,14 @@
 #######################################################################################
 
 resource "helm_release" "jenkins" {
+  count = var.jenkins ? 1 : 0
   name       = "jenkins"
   namespace  = var.namespace
-  chart      = "./jenkins/jenkins-5.2.0.tgz"
+  chart      = "./devpack/jenkins-5.2.0.tgz"
   version    = "5.2.0"
 
   values = [
-    "${file("./jenkins/values.yaml")}",
+    "${file("./devpack/values.yaml")}",
     var.keycloak ? local.keycloak_config : local.nokeycloak_config
   ]
 

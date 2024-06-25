@@ -31,16 +31,20 @@ module "keycloak" {
     namespace  = module.k8s_cluster.namespace
     password  = var.keycloak_password
     superadmin  = var.superadmin
-    keycloak_ingress  = local.keycloak_ingress
+    prometheus_ingress  = local.prometheus_ingress
+    alert_ingress  = local.alert_ingress
     grafana_ingress  = local.grafana_ingress
+    keycloak_ingress  = local.keycloak_ingress
+    jenkins = var.jenkins
     jenkins_ingress  = local.jenkins_ingress
     depends_on = [module.prometheus]
 }
 
-module "jenkins" {
-    count  = var.jenkins ? 1 : 0
-    source = "./jenkins"
+module "devpack" {
+    count  = var.devpack ? 1 : 0
+    source = "./devpack"
     namespace  = module.k8s_cluster.namespace
+    jenkins  = var.jenkins
     password  = var.jenkins_password
     jenkins_ingress  = local.jenkins_ingress
     keycloak_ingress  = local.keycloak_ingress
@@ -48,8 +52,3 @@ module "jenkins" {
     depends_on = [module.keycloak]
 }
 
-module "oauth" {
-    source = "./oauth2"
-    namespace  = module.k8s_cluster.namespace
-    depends_on = [module.keycloak]
-}

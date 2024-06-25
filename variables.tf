@@ -11,6 +11,11 @@ variable "docker_desktop" {
   type  = bool
   default = true
 }
+variable "devpack" {
+    description = "enable = true & disable = false"
+    type        = bool
+    default     = true
+}  
 locals {
     mydomain    = "${yamldecode(file("config.yaml")).baseconfig.common.mydomain}"
 }
@@ -86,7 +91,7 @@ locals {
 variable "jenkins" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = true
+    default     = false
 }  
 variable "jenkins_password" {
     description = "Type jenkins password"

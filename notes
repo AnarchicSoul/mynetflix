@@ -1,4 +1,44 @@
-- deploy nginx
+Job :
+- Design Terraform architecture:
+  Master
+    ∟ Module kubernetes
+        ∟ Deploy Nginx Ingress OSS (if true)
+        ∟ Deploy cert-manager (if true)
+    ∟ Module certificats
+        ∟ Create secret
+        ∟ Deploy certificates (with JKS)
+    ∟ Module prometheus 
+        ∟ Deploy prometheus (oauth2 + keycloak)
+        ∟ Deploy grafana (keycloak)
+        ∟ Deploy alertmanager (oauth2 + keycloak)
+        ∟ Deploy Mailhog (if true + oauth2 + keycloak)
+    ∟ Module keycloak (if true)
+        ∟ Deploy keycloak
+        ∟ Create monitor rules 
+        ∟ Deploy keycloak client (if true)
+    ∟ Module gravitee (if true)
+        ∟ Deploy Gravitee (keycloak)
+        ∟ Config publisher
+        ∟ Config portal
+    ∟ Module kubeshark (if true)
+        ∟ Deploy kubeshark
+    ∟ Module devpack (if true)
+        ∟ Deploy sonarkube
+        ∟ Deploy gitops
+        ∟ Deploy harbor
+        ∟ Deploy argocd (keycloak)
+        ∟ Config argocd (map to k8s and gitops)
+        ∟ Deploy jenkins (keycloak)
+        ∟ Create pipeline
+            ∟ push code to repo (docker file + helm)
+            ∟ build (CI)
+            ∟ Deploy netflix with argocd (CD)
+    ∟ Module homer (if true)
+        ∟ Deploy homer (oauth2 + keycloak)
+
+- deploy nginx:
+  --> 
+
 - deploy cert-manager
 - deploy prometheus
 - deploy keycloak
@@ -25,14 +65,10 @@
 - deploy plex or netflix
 - deploy homer
   -- protect with oauth2-proxy
-- --> idea:
-  UI = give movie name (or series)
-  API = LF DB website available + sort list of movies available
-  UI = show list, if download accepted go api
-  API = GET or POST download API
-  API = if series store good folder for netflix
-  use jenkins pipe for api and ui dev
-  protect api with apim and ui with keyckloak
+
+Limitations:
+Disabling prometheus and enabling keycloak is not possible or will crash (comma issue)
+
 
 Note for prom stack work with service monitor...
 prometheus:
@@ -41,11 +77,6 @@ prometheus:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
-
-Terraform arbo: 
-∟
-∟
-    ∟
 
 │ Warning: Helm uninstall returned an information message
 │ 

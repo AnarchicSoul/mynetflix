@@ -112,13 +112,13 @@ extraArgs:
   provider-display-name: Oauth2 Login
   client-id: prometheus
   client-secret: z4Ux09d1GrR5GVUMleJVSPwYkDFdiaxZ
+  ssl-insecure-skip-verify: true
+  scope: openid profile email
+  cookie-secure: "true"
   login-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/auth" 
   redeem-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/token"
   profile-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/userinfo" 
   validate-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/userinfo"
-  ssl-insecure-skip-verify: true
-  scope: openid profile email
-  cookie-secure: "true"
   upstream: "http://promstack-kube-prometheus-prometheus.toto.svc.cluster.local:9090"
 
 

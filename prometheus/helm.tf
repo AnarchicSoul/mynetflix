@@ -10,7 +10,9 @@ resource "helm_release" "prom_stack" {
 
   values = [
     "${file("./prometheus/values.yaml")}",
-    var.keycloak ? local.keycloak_config : local.nokeycloak_config
+    var.keycloak ? local.keycloak_config : local.nokeycloak_config,
+    var.keycloak ? "" : local.prometheus_ingress,
+    var.keycloak ? "" : local.alert_ingress
   ]
 
   set {
@@ -18,18 +20,9 @@ resource "helm_release" "prom_stack" {
       value = var.password
     }
   set {
-      name  = "prometheus.ingress.hosts[0]"
-      value = var.prometheus_ingress
-    }
-  set {
       name  = "grafana.ingress.hosts[0]"
       value = var.grafana_ingress
     }
-  set {
-      name  = "alertmanager.ingress.hosts[0]"
-      value = var.alert_ingress
-    }
-
 
 } 
 
@@ -42,20 +35,9 @@ resource "null_resource" "execute_sh" {
   }
 }
 
+
 locals {
-#    prometheus:
-#      ingress:
-#        tls: 
-#          - secretName: wildcard-cert
-#            hosts:
-#            - ${var.prometheus_ingress}
   keycloak_config = <<-EOT
-    alertmanager:
-      ingress:
-        tls: 
-          - secretName: wildcard-cert
-            hosts:
-            - ${var.alert_ingress}
     grafana:
       ingress:
         tls: 
@@ -79,5 +61,87 @@ locals {
   EOT
   nokeycloak_config = <<-EOT
     nameOverride: ""
+  EOT
+}
+
+resource "helm_release" "oauth_prometheus" {
+  count = var.keycloak ? 1 : 0
+  depends_on = [helm_release.prom_stack]
+  name       = "prometheus"
+  namespace  = var.namespace
+  chart      = "./prometheus/oauth2-proxy-7.7.4.tgz"
+  version    = "7.7.4"
+  values = [
+    "${file("./prometheus/oauth.yaml")}",
+    local.prometheus_config
+  ]
+} 
+resource "helm_release" "oauth_alert" {
+  count = var.keycloak ? 1 : 0
+  depends_on = [helm_release.prom_stack]
+  name       = "alertmanager"
+  namespace  = var.namespace
+  chart      = "./prometheus/oauth2-proxy-7.7.4.tgz"
+  version    = "7.7.4"
+  values = [
+    "${file("./prometheus/oauth.yaml")}",
+    local.alert_config
+  ]
+} 
+
+locals {
+  prometheus_config = <<-EOT
+    ingress:
+      hosts:
+        - ${var.prometheus_ingress}
+      tls: 
+        - secretName: wildcard-cert
+          hosts:
+          - ${var.prometheus_ingress}
+    extraArgs:
+      client-id: prometheus
+      login-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/auth" 
+      redeem-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/token"
+      profile-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo" 
+      validate-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo"
+      upstream: "http://promstack-kube-prometheus-prometheus.${var.namespace}.svc.cluster.local:9090"
+  EOT
+  prometheus_ingress = <<-EOT
+    prometheus:
+      ingress:
+        enabled: true
+        hosts:
+          - ${var.prometheus_ingress}
+        tls: 
+          - secretName: wildcard-cert
+            hosts:
+            - ${var.prometheus_ingress}
+  EOT
+  alert_config = <<-EOT
+    ingress:
+      hosts:
+        - ${var.alert_ingress}
+      tls: 
+        - secretName: wildcard-cert
+          hosts:
+          - ${var.alert_ingress}
+    extraArgs:
+      client-id: alertmanager
+      login-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/auth" 
+      redeem-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/token"
+      profile-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo" 
+      validate-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo"
+      upstream: "http://promstack-kube-prometheus-alertmanager.${var.namespace}.svc.cluster.local:9093"
+  EOT
+  alert_ingress = <<-EOT
+    alertmanager:
+      ingress:
+        enabled: true
+      hosts:
+        - ${var.alert_ingress}
+      tls: 
+        - secretName: wildcard-cert
+          hosts:
+          - ${var.alert_ingress}
   EOT
 }

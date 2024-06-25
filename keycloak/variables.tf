@@ -13,6 +13,15 @@ variable "keycloak_ingress" {
 variable "grafana_ingress" {
     type        = string
 }  
+variable "prometheus_ingress" {
+    type        = string
+}  
+variable "alert_ingress" {
+    type        = string
+}  
 variable "jenkins_ingress" {
     type        = string
+}  
+variable "jenkins" {
+    type        = bool
 }  
