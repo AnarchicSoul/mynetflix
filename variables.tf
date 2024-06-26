@@ -14,7 +14,7 @@ variable "docker_desktop" {
 variable "devpack" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = true
+    default     = false
 }  
 locals {
     mydomain    = "${yamldecode(file("config.yaml")).baseconfig.common.mydomain}"
@@ -49,9 +49,11 @@ locals {
     grafana_host = "${yamldecode(file("config.yaml")).baseconfig.prometheus.grafana_host}"
     alert_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.alertmanager_host}"
     prometheus_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.prometheus_host}"
+    mailhog_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.mailhog_host}"
     grafana_ingress = "${local.grafana_host}.${local.mydomain}"
     alert_ingress = "${local.alert_host}.${local.mydomain}"
     prometheus_ingress = "${local.prometheus_host}.${local.mydomain}"
+    mailhog_ingress = "${local.mailhog_host}.${local.mydomain}"
 }
 
 
@@ -103,4 +105,15 @@ variable "jenkins_password" {
 locals {
     jenkins_host    = "${yamldecode(file("config.yaml")).app.jenkins.jenkins_host}"
     jenkins_ingress = "${local.jenkins_host}.${local.mydomain}"
+}
+
+## homer Config
+variable "homer" {
+    description = "enable = true & disable = false"
+    type        = bool
+    default     = true
+}  
+locals {
+    homer_host    = "${yamldecode(file("config.yaml")).app.homer.homer_host}"
+    homer_ingress = "${local.homer_host}.${local.mydomain}"
 }

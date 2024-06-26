@@ -1,19 +1,19 @@
-variable "password" {
+variable "homer" {
+    type        = bool
+} 
+variable "homer_ingress" {
     type        = string
 }  
-variable "superadmin" {
-    type        = string
-}  
-variable "namespace" {
-    type = string
-}  
+variable "keycloak" {
+    type        = bool
+} 
 variable "keycloak_ingress" {
     type        = string
 }  
-variable "grafana_ingress" {
+variable "prometheus_ingress" {
     type        = string
 }  
-variable "prometheus_ingress" {
+variable "grafana_ingress" {
     type        = string
 }  
 variable "alert_ingress" {
@@ -22,15 +22,15 @@ variable "alert_ingress" {
 variable "mailhog_ingress" {
     type        = string
 }  
+variable "devpack" {
+    type        = bool
+} 
 variable "jenkins" {
     type        = bool
-}  
+} 
 variable "jenkins_ingress" {
     type        = string
 }  
-variable "homer" {
-    type        = bool
-}  
-variable "homer_ingress" {
-    type        = string
+variable "namespace" {
+    type = string
 }  

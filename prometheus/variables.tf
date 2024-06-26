@@ -7,6 +7,9 @@ variable "alert_ingress" {
 variable "grafana_ingress" {
     type        = string
 }  
+variable "mailhog_ingress" {
+    type        = string
+}  
 variable "keycloak_ingress" {
     type        = string
 }  

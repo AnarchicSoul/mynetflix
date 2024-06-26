@@ -35,6 +35,32 @@ resource "null_resource" "execute_sh" {
   }
 }
 
+resource "helm_release" "version_checker" {
+  name       = "version-chercker"
+  namespace  = var.namespace
+  chart      = "./prometheus/version-checker-v0.6.0.tgz"
+  version    = "0.6.0"
+
+  values = [
+    <<-EOF
+      service:
+        annotations:
+          prometheus.io/scrape: 'true'
+          prometheus.io/port: '8080'
+    EOF
+  ]
+} 
+
+resource "helm_release" "mailhog" {
+  name       = "mailhog-app"
+  namespace  = var.namespace
+  chart      = "./prometheus/mailhog-5.2.3.tgz"
+  version    = "5.2.3"
+
+  values = [
+    var.keycloak ? "" : local.mailhog_ingress
+  ]
+} 
 
 locals {
   keycloak_config = <<-EOT
@@ -69,10 +95,10 @@ resource "helm_release" "oauth_prometheus" {
   depends_on = [helm_release.prom_stack]
   name       = "prometheus"
   namespace  = var.namespace
-  chart      = "./prometheus/oauth2-proxy-7.7.4.tgz"
+  chart      = "./keycloak/oauth2/oauth2-proxy-7.7.4.tgz"
   version    = "7.7.4"
   values = [
-    "${file("./prometheus/oauth.yaml")}",
+    "${file("./keycloak/oauth2/values.yaml")}",
     local.prometheus_config
   ]
 } 
@@ -81,11 +107,23 @@ resource "helm_release" "oauth_alert" {
   depends_on = [helm_release.prom_stack]
   name       = "alertmanager"
   namespace  = var.namespace
-  chart      = "./prometheus/oauth2-proxy-7.7.4.tgz"
+  chart      = "./keycloak/oauth2/oauth2-proxy-7.7.4.tgz"
   version    = "7.7.4"
   values = [
-    "${file("./prometheus/oauth.yaml")}",
+    "${file("./keycloak/oauth2/values.yaml")}",
     local.alert_config
+  ]
+} 
+resource "helm_release" "oauth_mailhog" {
+  count = var.keycloak ? 1 : 0
+  depends_on = [helm_release.prom_stack]
+  name       = "mailhog"
+  namespace  = var.namespace
+  chart      = "./keycloak/oauth2/oauth2-proxy-7.7.4.tgz"
+  version    = "7.7.4"
+  values = [
+    "${file("./keycloak/oauth2/values.yaml")}",
+    local.mailhog_config
   ]
 } 
 
@@ -143,5 +181,34 @@ locals {
         - secretName: wildcard-cert
           hosts:
           - ${var.alert_ingress}
+  EOT
+  mailhog_config = <<-EOT
+    ingress:
+      hosts:
+        - ${var.mailhog_ingress}
+      tls: 
+        - secretName: wildcard-cert
+          hosts:
+          - ${var.mailhog_ingress}
+    extraArgs:
+      client-id: mailhog
+      login-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/auth" 
+      redeem-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/token"
+      profile-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo" 
+      validate-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo"
+      upstream: "http://mailhog-app.${var.namespace}.svc.cluster.local:8025"
+  EOT
+  mailhog_ingress = <<-EOT
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+        - host: ${var.mailhog_ingress}
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - host: ${var.mailhog_ingress}
+          secretName: wildcard-cert
   EOT
 }

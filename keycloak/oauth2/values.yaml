@@ -121,7 +121,6 @@ extraArgs:
   validate-url: "https://keycloak.toto.svc.cluster.local/realms/realm1/protocol/openid-connect/userinfo"
   upstream: "http://promstack-kube-prometheus-prometheus.toto.svc.cluster.local:9090"
 
-
 extraEnv: []
 
 envFrom: []
@@ -385,10 +384,10 @@ htpasswdFile:
 # Configure the session storage type, between cookie and redis
 sessionStorage:
   # Can be one of the supported session storage cookie|redis
-  type: cookie
+  type: redis
   redis:
     # Name of the Kubernetes secret containing the redis & redis sentinel password values (see also `sessionStorage.redis.passwordKey`)
-    existingSecret: ""
+    existingSecret: "redis"
     # Redis password value. Applicable for all Redis configurations. Taken from redis subchart secret if not set. `sessionStorage.redis.existingSecret` takes precedence
     password: ""
     # Key of the Kubernetes secret data containing the redis password value
@@ -397,7 +396,7 @@ sessionStorage:
     clientType: "standalone"
     standalone:
       # URL of redis standalone server for redis session storage (e.g. `redis://HOST[:PORT]`). Automatically generated if not set
-      connectionUrl: ""
+      connectionUrl: "redis://redis-master:6379"
     cluster:
       # List of Redis cluster connection URLs (e.g. `["redis://127.0.0.1:8000", "redis://127.0.0.1:8000"]`)
       connectionUrls: []

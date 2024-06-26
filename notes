@@ -69,6 +69,8 @@ Job :
 Limitations:
 Disabling prometheus and enabling keycloak is not possible or will crash (comma issue)
 
+TODO: 
+Ajouter si keycloak = false alors pas de redis 
 
 Note for prom stack work with service monitor...
 prometheus:

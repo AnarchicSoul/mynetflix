@@ -39,6 +39,8 @@ keycloakConfigCli:
           "clients": [
             ${local.client_prometheus}
             ${local.client_grafana}
+            ${local.client_mailhog}
+            ${var.homer ? local.client_homer : ""}
             ${var.jenkins ? local.client_jenkins : ""}
             ${local.client_alertmanager}
           ],

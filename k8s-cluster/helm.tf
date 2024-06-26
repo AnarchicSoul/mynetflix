@@ -49,3 +49,19 @@ resource "helm_release" "nginx" {
     }
 
 } 
+
+
+resource "helm_release" "redis" {
+  name       = "redis"
+  namespace  = var.namespace
+  chart      = "./keycloak/redis/redis-19.5.5.tgz"
+  version    = "19.5.5"
+  set {
+      name  = "metrics.enabled"
+      value = "true"
+    }
+  set {
+      name  = "architecture"
+      value = "standalone"
+    }
+} 

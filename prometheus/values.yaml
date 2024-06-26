@@ -296,8 +296,11 @@ alertmanager:
   ## ref: https://prometheus.io/docs/alerting/configuration/#configuration-file
   ##      https://prometheus.io/webtools/alerting/routing-tree-editor/
   ##
+  
   config:
     global:
+      smtp_smarthost: 'mailhog-app:1025'
+      smtp_from: 'alertmanager@example.com'
       resolve_timeout: 5m
     inhibit_rules:
       - source_matchers:
@@ -327,13 +330,16 @@ alertmanager:
       group_wait: 30s
       group_interval: 5m
       repeat_interval: 12h
-      receiver: 'null'
+      receiver: 'smtp'
       routes:
-      - receiver: 'null'
+      - receiver: 'smtp'
         matchers:
           - alertname = "Watchdog"
     receivers:
-    - name: 'null'
+    - name: 'smtp'
+      email_configs:
+      - to: 'someuser@example.com'
+        require_tls: false
     templates:
     - '/etc/alertmanager/config/*.tmpl'
 
@@ -947,7 +953,17 @@ alertmanager:
 grafana:
   enabled: true
   namespaceOverride: ""
-
+  alerting:
+    contactpoints.yaml:
+      apiVersion: 1
+      contactPoints:
+        - orgId: 1
+          name: cp_1
+          receivers:
+            - uid: first_uid
+              type: prometheus-alertmanager
+              settings:
+                url: http://alertmanager-operated:9093
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -969,6 +985,10 @@ grafana:
         datasource: Prometheus
       keycloak:
         gnetId: 19659
+        revision: 1
+        datasource: Prometheus
+      versioncheck:
+        gnetId: 12833
         revision: 1
         datasource: Prometheus
   ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled

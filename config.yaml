@@ -10,9 +10,12 @@ baseconfig:
     grafana_host: "grafana"
     alertmanager_host: "alertmanager"
     prometheus_host: "prometheus"
+    mailhog_host: "mailhog"
   keycloak:
     keycloak_host: "keycloak"
 app:
   jenkins:
     jenkins_host: "jenkins"
+  homer:
+    homer_host: "homer"
 
