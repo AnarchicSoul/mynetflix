@@ -71,6 +71,7 @@ Disabling prometheus and enabling keycloak is not possible or will crash (comma 
 
 TODO: 
 Ajouter si keycloak = false alors pas de redis 
+ajouter dossier docs/classroom + docs/img pour readme.md et notes dans docs/
 
 Note for prom stack work with service monitor...
 prometheus:
