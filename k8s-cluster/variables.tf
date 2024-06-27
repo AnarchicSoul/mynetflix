@@ -7,3 +7,6 @@ variable "certmgr" {
 variable "nginxoss" {
   type  = bool
 }  
+variable "keycloak" {
+  type  = bool
+}  

@@ -52,6 +52,7 @@ resource "helm_release" "nginx" {
 
 
 resource "helm_release" "redis" {
+  count  = var.keycloak ? 1 : 0
   name       = "redis"
   namespace  = var.namespace
   chart      = "./keycloak/redis/redis-19.5.5.tgz"

@@ -3,6 +3,7 @@ module "k8s_cluster" {
     namespace  = local.namespace
     certmgr = var.certmgr
     nginxoss = var.nginxoss
+    keycloak = var.keycloak
 }
 
 module "certmgr" {
@@ -22,6 +23,7 @@ module "prometheus" {
     grafana_ingress  = local.grafana_ingress
     keycloak_ingress  = local.keycloak_ingress
     mailhog_ingress  = local.mailhog_ingress
+    kubeshark_ingress  = local.kubeshark_ingress
     keycloak = var.keycloak
     depends_on = [module.certmgr]
 }
@@ -36,6 +38,7 @@ module "keycloak" {
     alert_ingress  = local.alert_ingress
     grafana_ingress  = local.grafana_ingress
     mailhog_ingress  = local.mailhog_ingress
+    kubeshark_ingress  = local.kubeshark_ingress
     keycloak_ingress  = local.keycloak_ingress
     jenkins = var.jenkins
     jenkins_ingress  = local.jenkins_ingress
@@ -68,6 +71,7 @@ module "homer" {
     alert_ingress  = local.alert_ingress
     grafana_ingress  = local.grafana_ingress
     mailhog_ingress  = local.mailhog_ingress
+    kubeshark_ingress  = local.kubeshark_ingress
     devpack = var.devpack
     jenkins = var.jenkins
     jenkins_ingress  = local.jenkins_ingress

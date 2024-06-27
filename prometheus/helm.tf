@@ -62,6 +62,28 @@ resource "helm_release" "mailhog" {
   ]
 } 
 
+resource "helm_release" "kubeshark" {
+  name       = "kubeshark-app"
+  namespace  = var.namespace
+  chart      = "./prometheus/kubeshark-52.3.62.tgz"
+  version    = "52.3.62"
+
+  values = [
+    var.keycloak ? "" : local.kubeshark_ingress
+  ]
+
+  set {
+      name  = "tap.storageClass"
+      value = "default"
+    }
+  set {
+      name  = "tap.tls"
+      value = "false"
+    }
+
+
+}
+
 locals {
   keycloak_config = <<-EOT
     grafana:
@@ -116,7 +138,7 @@ resource "helm_release" "oauth_alert" {
 } 
 resource "helm_release" "oauth_mailhog" {
   count = var.keycloak ? 1 : 0
-  depends_on = [helm_release.prom_stack]
+  depends_on = [helm_release.mailhog]
   name       = "mailhog"
   namespace  = var.namespace
   chart      = "./keycloak/oauth2/oauth2-proxy-7.7.4.tgz"
@@ -124,6 +146,18 @@ resource "helm_release" "oauth_mailhog" {
   values = [
     "${file("./keycloak/oauth2/values.yaml")}",
     local.mailhog_config
+  ]
+} 
+resource "helm_release" "oauth_kubeshark" {
+  count = var.keycloak ? 1 : 0
+  depends_on = [helm_release.kubeshark]
+  name       = "kubeshark"
+  namespace  = var.namespace
+  chart      = "./keycloak/oauth2/oauth2-proxy-7.7.4.tgz"
+  version    = "7.7.4"
+  values = [
+    "${file("./keycloak/oauth2/values.yaml")}",
+    local.kubeshark_config
   ]
 } 
 
@@ -210,5 +244,33 @@ locals {
       tls:
         - host: ${var.mailhog_ingress}
           secretName: wildcard-cert
+  EOT
+  kubeshark_config = <<-EOT
+    ingress:
+      hosts:
+        - ${var.kubeshark_ingress}
+      tls: 
+        - secretName: wildcard-cert
+          hosts:
+          - ${var.kubeshark_ingress}
+    extraArgs:
+      client-id: kubeshark
+      login-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/auth" 
+      redeem-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/token"
+      profile-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo" 
+      validate-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo"
+      upstream: "http://kubeshark-front.${var.namespace}.svc.cluster.local:80"
+  EOT
+  kubeshark_ingress = <<-EOT
+    tap:
+      ingress:
+        enabled: "true"
+        host: "${var.kubeshark_ingress}"
+        className: "nginx"
+        tls:
+          - secretName: "wildcard-cert"
+            hosts:
+            - "${var.kubeshark_ingress}"
+  }
   EOT
 }

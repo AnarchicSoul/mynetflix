@@ -68,10 +68,11 @@ Job :
 
 Limitations:
 Disabling prometheus and enabling keycloak is not possible or will crash (comma issue)
+Only working for docker-desktop for the moment 
 
 TODO: 
-Ajouter si keycloak = false alors pas de redis 
-ajouter dossier docs/classroom + docs/img pour readme.md et notes dans docs/
+install gravitee 
+image ubuntu/debian -> openssh service --> terra ansible connect ssh et deploy apache --> terra ansible connect ssh et accueil = oh my ding ding dong  --> default nginx ingress 
 
 Note for prom stack work with service monitor...
 prometheus:

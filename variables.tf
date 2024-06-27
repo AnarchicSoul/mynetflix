@@ -50,10 +50,12 @@ locals {
     alert_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.alertmanager_host}"
     prometheus_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.prometheus_host}"
     mailhog_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.mailhog_host}"
+    kubeshark_host    = "${yamldecode(file("config.yaml")).baseconfig.prometheus.kubeshark_host}"
     grafana_ingress = "${local.grafana_host}.${local.mydomain}"
     alert_ingress = "${local.alert_host}.${local.mydomain}"
     prometheus_ingress = "${local.prometheus_host}.${local.mydomain}"
     mailhog_ingress = "${local.mailhog_host}.${local.mydomain}"
+    kubeshark_ingress = "${local.kubeshark_host}.${local.mydomain}"
 }
 
 

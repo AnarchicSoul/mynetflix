@@ -991,6 +991,10 @@ grafana:
         gnetId: 12833
         revision: 1
         datasource: Prometheus
+      kubeshark:
+        gnetId: 21332
+        revision: 1
+        datasource: Prometheus
   ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
   ##
   forceDeployDatasources: false
@@ -3862,7 +3866,24 @@ prometheus:
         - source_labels: [__meta_kubernetes_service_name]
           action: replace
           target_label: kubernetes_name
-
+      - job_name: 'kubeshark-worker-metrics'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            target_label: node
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: ^metrics$
+          - source_labels: [__address__, __meta_kubernetes_endpoint_port_number]
+            action: replace
+            regex: ([^:]+)(?::\d+)?
+            replacement: $1:49100
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_(.+)
     ## If additional scrape configurations are already deployed in a single secret file you can use this section.
     ## Expected values are the secret name and key
     ## Cannot be used with additionalScrapeConfigs

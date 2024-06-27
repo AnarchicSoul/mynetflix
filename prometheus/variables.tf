@@ -13,6 +13,9 @@ variable "mailhog_ingress" {
 variable "keycloak_ingress" {
     type        = string
 }  
+variable "kubeshark_ingress" {
+    type        = string
+}  
 variable "password" {
     type        = string
 }  

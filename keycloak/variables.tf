@@ -22,6 +22,9 @@ variable "alert_ingress" {
 variable "mailhog_ingress" {
     type        = string
 }  
+variable "kubeshark_ingress" {
+    type        = string
+}  
 variable "jenkins" {
     type        = bool
 }  

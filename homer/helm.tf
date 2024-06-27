@@ -38,6 +38,8 @@ locals {
                     url: "https://${var.alert_ingress}"
                   - name: "Mailhog"
                     url: "https://${var.mailhog_ingress}"
+                  - name: "Kubeshark"
+                    url: "https://${var.kubeshark_ingress}"
               ${var.keycloak ? "- name: \"Security\"\n            items:\n              - name: \"Keycloak\"\n                url: \"https://${var.keycloak_ingress}\"" : ""}
               ${var.devpack ? "- name: \"Devpack\"\n            items:" : ""}
                   ${var.jenkins ? "- name: \"jenkins\"\n                url: \"https://${var.jenkins_ingress}\"" : ""}

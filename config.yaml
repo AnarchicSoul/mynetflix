@@ -11,6 +11,7 @@ baseconfig:
     alertmanager_host: "alertmanager"
     prometheus_host: "prometheus"
     mailhog_host: "mailhog"
+    kubeshark_host: "kubeshark"
   keycloak:
     keycloak_host: "keycloak"
 app:
