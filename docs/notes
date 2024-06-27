@@ -91,3 +91,5 @@ prometheus:
 │ [CustomResourceDefinition] issuers.cert-manager.io
 │ [CustomResourceDefinition] orders.acme.cert-manager.io
 │ 
+
+https://plantuml.com/fr/yaml

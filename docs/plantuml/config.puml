@@ -1,0 +1,16 @@
+@startyaml
+baseconfig: 
+  common:
+    mydomain: "localhost"
+  kubernetes:
+    namespace: "toto"
+  prometheus:
+    grafana_host: "grafana"
+    alertmanager_host: "alertmanager"
+    prometheus_host: "prometheus"
+  keycloak:
+    keycloak_host: "keycloak"
+app:
+  jenkins:
+    jenkins_host: "jenkins"
+@endyaml
