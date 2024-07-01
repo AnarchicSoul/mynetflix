@@ -29,7 +29,7 @@ pipeline {
                 container('maven') {
                     sh 'mvn -version'
                     withSonarQubeEnv(installationName:'sonar') {
-                        sh "clean verify sonar:sonar -Dsonar.projectKey=test2 -Dsonar.projectName='test2'"
+                        sh "mvn clean verify sonar:sonar -Dsonar.projectKey=test2 -Dsonar.projectName='test2'"
                     }
                 }
             }
