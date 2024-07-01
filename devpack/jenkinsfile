@@ -24,6 +24,12 @@ pipeline {
         }
     }
     stages {
+        stage('Checkout') {
+            steps {
+                // Checkout du code source depuis GitHub
+                git 'https://github.com/AnarchicSoul/mynetflix.git'
+            }
+        }
         stage('Run maven') {
             steps {
                 container('maven') {
