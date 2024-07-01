@@ -1,22 +1,11 @@
 pipeline {
     agent any
-    tools {
-        maven 'Maven'
-    }
 
     stages {
-        stage('Git Checkout') {
-            steps {
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/AnarchicSoul/mynetflix']])
-                echo 'Git Checkout Completed'
-            }
-        }
-
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('ServerNameSonar') {
-                    bat '''mvn clean verify sonar:sonar -Dsonar.projectKey=aaa -Dsonar.projectName='aaa' -Dsonar.host.url=http://sonarqube-sonarqube:9000''' //port 9000 is default for sonar
-                    echo 'SonarQube Analysis Completed'
+                withSonarQubeEnv(installationName:'test') {
+                    sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
                 }
             }
         }
