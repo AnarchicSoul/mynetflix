@@ -24,9 +24,6 @@ pipeline {
         }
     }
     stages {
-        stage('SCM') {
-            checkout scm
-        }
         stage('Run maven') {
             steps {
                 container('maven') {
