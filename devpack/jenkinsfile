@@ -34,8 +34,6 @@ pipeline {
                 }
             }
         }
-    }
-    stages {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv(installationName:'sonar') {
