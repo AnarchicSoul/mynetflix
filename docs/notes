@@ -90,6 +90,11 @@ TODO - V2 (VS):
 install gravitee > pas possible trops de CPU -> APISIX pas possible car localhost pris.  // disable docker desktop
 déployer elastic + postgresql (gravitee = mongo et elastic / keycloak et sonaqube = postgrsql) // disable docker desktop
 Deploy Harbor with Trivy and image scan
+Deploy KubeScan
+Deploy Kube-Hunter
+Deploy Kube-bench
+Deploy Kube-score
+Deploy full ECK stack (SIEM ?)
 
 TODO - V3 (PROD): 
 Azure ressources
@@ -111,25 +116,3 @@ prometheus:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
-
-
-Pour scanner les pods Kubernetes :
-
-KubeScan :
-KubeScan est un scanner de sécurité Kubernetes open source qui peut être utilisé pour analyser les configurations de sécurité des pods Kubernetes en cours d'exécution.
-GitHub : kube-scan/kube-scan
-
-Kube-Hunter :
-Kube-Hunter est un outil de sécurité open source qui permet de détecter les vulnérabilités potentielles dans les clusters Kubernetes, y compris les pods.
-GitHub : aquasecurity/kube-hunter
-
-
-Pour scanner le cluster Kubernetes :
-
-Kube-bench :
-Kube-bench est un outil de benchmarking de sécurité qui évalue un cluster Kubernetes par rapport à une série de bonnes pratiques de sécurité.
-GitHub : aquasecurity/kube-bench
-
-Kube-score :
-Kube-score est un outil qui évalue la configuration et les objets Kubernetes pour détecter les meilleures pratiques, les bonnes configurations et les problèmes de sécurité potentiels.
-GitHub : kube-score/kube-score
