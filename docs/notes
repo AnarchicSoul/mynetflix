@@ -24,8 +24,6 @@ Job :
         ∟ Deploy kubeshark
     ∟ Module devpack (if true)
         ∟ Deploy sonarkube
-        ∟ Deploy gitops
-        ∟ Deploy harbor
         ∟ Deploy argocd (keycloak)
         ∟ Config argocd (map to k8s and gitops)
         ∟ Deploy jenkins (keycloak)
@@ -37,7 +35,8 @@ Job :
         ∟ Deploy homer (oauth2 + keycloak)
 
 - deploy nginx:
-  --> 
+  --> no issues
+  --> added x-forward option
 
 - deploy cert-manager
 - deploy prometheus
@@ -49,8 +48,6 @@ Job :
   -- connect oauth2-proxy with keycloak
   -- protect prometheus and alertmanager UI with oauth2-proxy
 - deploy argocd
-- deploy harbor
-  -- connect harbor with keycloak
 - deploy myapp
   -- using jenkins 
   -- using argocd 
@@ -69,11 +66,42 @@ Job :
 Limitations:
 Disabling prometheus and enabling keycloak is not possible or will crash (comma issue)
 Only working for docker-desktop for the moment 
+Impossible (or too hard) to automatize sonarqube project creation with token. Same for jenkins pipeline. Will need to follow memo
+Sonaqube cannot be plug to keycloak. Will use oauth2 but it will have a doble authent... 
 
-TODO: 
-install gravitee > pas possible trops de CPU -> APISIX pas possible car localhost pris. 
-déployer mongodb + elastic + postgresql (gravitee = mongo et elastic / keycloak et sonaqube = postgrsql)
-image ubuntu/debian -> openssh service --> terra ansible connect ssh et deploy apache --> terra ansible connect ssh et accueil = oh my ding ding dong  --> default nginx ingress 
+TODO - INIT (DEV): 
+prometheus true/false
+config sonarqube + jenkins
+  true/false
+  set password 
+  set keycloak oauth2 
+  image ubuntu/debian -> openssh service --> terra ansible connect ssh et manage sonar et jenkins 
+déployer mongodb
+déployer argocd
+test API full CI/CD
+  CI - sonar scan git
+  CI - docker build 
+  CI - docker push docker hub
+  CD - argocd sync
+  CD - test
+Rename project (git repo)
+
+TODO - V2 (VS): 
+install gravitee > pas possible trops de CPU -> APISIX pas possible car localhost pris.  // disable docker desktop
+déployer elastic + postgresql (gravitee = mongo et elastic / keycloak et sonaqube = postgrsql) // disable docker desktop
+
+TODO - V3 (PROD): 
+Azure ressources
+full HTTPS 
+
+Memo: 
+SonarQube 
+  -> Create project 
+  -> Create user token 
+  -> Create jenkins credentials 'secret text'
+  -> Set sonarqube server in jenkins global config 
+  -> Create jenkins pipeline SCM pointing to GIT 
+      Note --> Jenkins File is in devpack/ 
 
 Note for prom stack work with service monitor...
 prometheus:
@@ -82,16 +110,3 @@ prometheus:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
-
-│ Warning: Helm uninstall returned an information message
-│ 
-│ These resources were kept due to the resource policy:
-│ [CustomResourceDefinition] certificaterequests.cert-manager.io
-│ [CustomResourceDefinition] certificates.cert-manager.io
-│ [CustomResourceDefinition] challenges.acme.cert-manager.io
-│ [CustomResourceDefinition] clusterissuers.cert-manager.io
-│ [CustomResourceDefinition] issuers.cert-manager.io
-│ [CustomResourceDefinition] orders.acme.cert-manager.io
-│ 
-
-https://plantuml.com/fr/yaml
