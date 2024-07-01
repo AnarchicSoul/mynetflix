@@ -29,7 +29,7 @@ pipeline {
                 container('maven') {
                     sh 'mvn -version'
                     withSonarQubeEnv(installationName:'sonar') {
-                        sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                        sh ''''mvn clean verify sonar:sonar -Dsonar.projectKey=test2 -Dsonar.projectName='test2' -Dsonar.host.url=http://sonaqube-sonarqube:9000''''
                     }
                 }
             }
