@@ -53,3 +53,10 @@ locals {
   EOT
 }
 
+resource "helm_release" "sonarqube" {
+  name       = "sonarqube"
+  namespace  = var.namespace
+  chart      = "./devpack/sonarqube-10.5.1+2816.tgz"
+  version    = "10.5.1+2816"
+
+} 

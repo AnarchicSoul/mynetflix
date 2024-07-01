@@ -411,6 +411,7 @@ controller:
     - kubernetes-cli:1.12.1
     - keycloak:2.3.2
     - prometheus:773.v3b_62d8178eec
+    - maven-plugin:3.23
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies

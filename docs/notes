@@ -71,7 +71,8 @@ Disabling prometheus and enabling keycloak is not possible or will crash (comma 
 Only working for docker-desktop for the moment 
 
 TODO: 
-install gravitee 
+install gravitee > pas possible trops de CPU -> APISIX pas possible car localhost pris. 
+déployer mongodb + elastic + postgresql (gravitee = mongo et elastic / keycloak et sonaqube = postgrsql)
 image ubuntu/debian -> openssh service --> terra ansible connect ssh et deploy apache --> terra ansible connect ssh et accueil = oh my ding ding dong  --> default nginx ingress 
 
 Note for prom stack work with service monitor...

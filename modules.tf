@@ -77,3 +77,9 @@ module "homer" {
     jenkins_ingress  = local.jenkins_ingress
     depends_on = [module.keycloak]
 }
+
+module "apim" {
+    count  = var.docker_desktop ? 0 : 1
+    source = "./gravitee"
+    depends_on = [module.keycloak]
+}

@@ -1,0 +1,875 @@
+adminAccountEnable: true
+adminEmail: null
+adminFirstName: null
+adminLastName: null
+adminPasswordBcrypt: $2a$10$Ihk05VSds5rUSgMdsMVi9OKMIx2yUvMz7y9VP3rJmQeizZLrhLMyq
+alerts:
+  enabled: false
+  endpoints:
+  - http://localhost:8072/
+  security:
+    enabled: false
+    password: adminadmin
+    username: admin
+api:
+  additionalPlugins: null
+  analytics:
+    type: elasticsearch
+  autoscaling:
+    enabled: false
+    maxReplicas: 3
+    minReplicas: 1
+    targetAverageUtilization: 50
+    targetMemoryAverageUtilization: 80
+  configuration:
+    logging: {}
+  deployment:
+    affinity: {}
+    annotations: {}
+    customLivenessProbe: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    envFrom: []
+    hostAliases: []
+    labels: {}
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      tcpSocket:
+        port: http
+    nodeSelector:
+      kubernetes.io/os: linux
+    podSecurityContext: null
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      tcpSocket:
+        port: http
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1001
+    serviceAccount: ""
+    startupProbe:
+      enabled: true
+      failureThreshold: 30
+      periodSeconds: 10
+      tcpSocket:
+        port: http
+    strategy:
+      rollingUpdate:
+        maxUnavailable: 1
+      type: RollingUpdate
+    tolerations: []
+    topologySpreadConstraints: []
+  enabled: true
+  env: []
+  extraVolumeMounts: |
+    - name: truststore-jks
+      mountPath: /opt/graviteeio-gateway/config/truststore.jks
+      subPath: truststore.jks
+  extraVolumes: |
+    - name: truststore-jks
+      configMap:
+        name: truststore.jks
+        items:
+          - key: truststore.jks
+            path: truststore.jks
+  gateway:
+    unknownExpireAfter: 604800
+  http:
+    api:
+      entrypoint: /
+    client:
+      timeout: 10000
+    services:
+      core:
+        http:
+          authentication:
+            password: adminadmin
+          enabled: true
+          host: localhost
+          port: 18083
+        ingress:
+          enabled: false
+          ingressClassName: ""
+          pathType: Prefix
+        service:
+          enabled: false
+  image:
+    pullPolicy: Always
+    repository: graviteeio/apim-management-api
+  ingress:
+    management:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/configuration-snippet: |
+          etag on;
+          proxy_pass_header ETag;
+          proxy_pass_header if-match;
+      enabled: true
+      hosts:
+      - ihm-gravitee.plt.mobility-solutions.fr
+      ingressClassName: dmz-nginx
+      path: /management
+      pathType: Prefix
+      scheme: https
+      tls:
+      - hosts:
+        - ihm-gravitee.plt.mobility-solutions.fr
+        secretName: public-certificate
+    portal:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/configuration-snippet: |
+          etag on;
+          proxy_pass_header ETag;
+          proxy_set_header if-match "";
+      enabled: true
+      hosts:
+      - ihm-gravitee.plt.mobility-solutions.fr
+      ingressClassName: dmz-nginx
+      path: /portal
+      pathType: Prefix
+      scheme: https
+      tls:
+      - hosts:
+        - ihm-gravitee.plt.mobility-solutions.fr
+        secretName: public-certificate
+  logging:
+    debug: false
+    file:
+      enabled: true
+      encoderPattern: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%n'
+      rollingPolicy: |
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${gravitee.management.log.dir}/gravitee_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    graviteeLevel: DEBUG
+    jettyLevel: INFO
+    stdout:
+      encoderPattern: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
+      json: false
+  name: api
+  newsletterEnabled: true
+  pdb:
+    enabled: false
+    maxUnavailable: 50%
+    minAvailable: ""
+  podAnnotations: {}
+  priorityClassName: ""
+  ratingEnabled: true
+  reloadOnConfigChange: true
+  replicaCount: 1
+  replicatCount: 2
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  restartPolicy: OnFailure
+  service:
+    externalPort: 83
+    externalTrafficPolicy: Cluster
+    internalPort: 8083
+    internalPortName: http
+    type: ClusterIP
+  services:
+    bridge:
+      enabled: false
+      ingress:
+        annotations: {}
+        enabled: false
+        hosts:
+        - apim.example.com
+        ingressClassName: ""
+        path: /api/_bridge
+        pathType: Prefix
+      service:
+        externalPort: 92
+        internalPort: 18092
+      ssl:
+        enabled: false
+    metrics:
+      enabled: false
+      prometheus:
+        enabled: true
+    subscription:
+      enabled: false
+  ssl:
+    enabled: false
+  supportEnabled: true
+  terminationGracePeriod: 30
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  upgrader: false
+  user:
+    anynomizeOnDelete: false
+    login:
+      defaultApplication: true
+apim:
+  dbLess: false
+  managedServiceAccount: true
+  name: apim
+  roleRules:
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    - secrets
+    verbs:
+    - get
+    - list
+    - watch
+  serviceAccount: ""
+chaos:
+  enabled: false
+cockpit:
+  controller: https://cockpit-controller.gravitee.io
+  enabled: false
+  keystore:
+    password: null
+    value: base64 encoded value of the keystore provided by Cockpit (required)
+  ssl:
+    verifyHostname: true
+  url: https://cockpit.gravitee.io
+common:
+  annotations: {}
+  labels: {}
+elasticsearch:
+  coordinating:
+    replicas: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 25m
+        memory: 256Mi
+  data:
+    heapSize: 512m
+    persistence:
+      size: 20Gi
+    replicas: 2
+    resources:
+      limits:
+        cpu: 1
+        memory: 2048Mi
+      requests:
+        cpu: 50m
+        memory: 1024Mi
+  enabled: false
+  fullnameOverride: graviteeio-apim-elasticsearch
+  image:
+    repository: bitnami/elasticsearch
+    tag: 8.8.2
+  master:
+    persistence:
+      size: 4Gi
+    replicas: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 25m
+        memory: 256Mi
+  name: elasticsearch
+es:
+  cluster: elasticsearch
+  enabled: true
+  endpoints:
+  - http://graviteeio-apim-elasticsearch-ingest-hl:9200
+  index: gravitee
+  index_mode: daily
+  lifecycle:
+    enabled: false
+    policies:
+      health: my_policy
+      log: my_policy
+      monitor: my_policy
+      request: my_policy
+    policyPropertyName: index.lifecycle.name
+  pipeline:
+    plugins:
+      ingest: geoip, user_agent
+  security:
+    enabled: false
+    password: example
+    username: example
+  settings:
+    number_of_replicas: 1
+    number_of_shards: 1
+    refresh_interval: 5s
+  ssl:
+    enabled: false
+extraInMemoryUsers: |
+  - user:
+    username: user
+    # Password value: password
+    password: $2a$10$9kjw/SH9gucCId3Lnt6EmuFreUAcXSZgpvAYuW2ISv7hSOhHRH1AO
+    roles: ORGANIZATION:USER, ENVIRONMENT:USER
+    # Useful to receive notifications
+    #email:
+    #firstName:
+    #lastName:
+  - user:
+    username: api1
+    # Password value: api1
+    password: $2a$10$iXdXO4wAYdhx2LOwijsp7.PsoAZQ05zEdHxbriIYCbtyo.y32LTji
+    # You can declare multiple roles using comma separator
+    roles: ORGANIZATION:USER, ENVIRONMENT:API_PUBLISHER
+    #email:
+    #firstName:
+    #lastName:
+  - user:
+    username: application1
+    # Password value: application1
+    password: $2a$10$2gtKPYRB9zaVaPcn5RBx/.3T.7SeZoDGs9GKqbo9G64fKyXFR1He.
+    roles: ORGANIZATION:USER, ENVIRONMENT:USER
+    #email:
+    #firstName:
+    #lastName:
+extraObjects: []
+gateway:
+  additionalPlugins: null
+  apiKey:
+    header: X-Gravitee-Api-Key
+    param: api-key
+  autoscaling:
+    enabled: false
+    maxReplicas: 3
+    minReplicas: 1
+    targetAverageUtilization: 50
+    targetMemoryAverageUtilization: 80
+  classloader:
+    legacy:
+      enabled: false
+  dbLess: false
+  deployment:
+    affinity: {}
+    annotations: {}
+    customLivenessProbe: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    envFrom: []
+    hostAliases: []
+    labels: {}
+    livenessProbe:
+      enabled: true
+    nodeSelector:
+      kubernetes.io/os: linux
+    podSecurityContext: null
+    readinessProbe:
+      enabled: true
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1001
+    serviceAccount: ""
+    startupProbe:
+      enabled: true
+    strategy:
+      rollingUpdate:
+        maxUnavailable: 1
+      type: RollingUpdate
+    tolerations: []
+    topologySpreadConstraints: []
+  enabled: true
+  env: []
+  extraVolumeMounts: |
+    - name: truststore-jks
+      mountPath: /opt/graviteeio-gateway/config/truststore.jks
+      subPath: truststore.jks
+  extraVolumes: |
+    - name: truststore-jks
+      configMap:
+        name: truststore.jks
+        items:
+          - key: truststore.jks
+            path: truststore.jks
+  gracefulShutdown:
+    delay: 0
+    unit: MILLISECONDS
+  http:
+    alpn: "true"
+    maxChunkSize: 8192
+    maxFormAttributeSize: 2048
+    maxHeaderSize: 8192
+    maxInitialLineLength: 4096
+    requestTimeout: 30000
+    requestTimeoutGraceDelay: 30
+  image:
+    pullPolicy: Always
+    repository: graviteeio/apim-gateway
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    enabled: true
+    hosts:
+    - api-gravitee.plt.mobility-solutions.fr
+    ingressClassName: dmz-nginx
+    path: /
+    pathType: Prefix
+    tls:
+    - hosts:
+      - api-gravitee.plt.mobility-solutions.fr
+      secretName: public-certificate
+  ingressController:
+    enabled: false
+    ingressClassName: graviteeio
+  logging:
+    debug: false
+    file:
+      enabled: true
+      encoderPattern: '%d{HH:mm:ss.SSS} [%thread] [%X{api}] %-5level %logger{36} -
+        %msg%n'
+      rollingPolicy: |
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${gravitee.home}/logs/gravitee_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    graviteeLevel: DEBUG
+    jettyLevel: WARN
+    stdout:
+      encoderPattern: '%d{HH:mm:ss.SSS} [%thread] [%X{api}] %-5level %logger{36} -
+        %msg%n'
+      json: false
+  management:
+    http: null
+  name: ext-gateway
+  pdb:
+    enabled: false
+    maxUnavailable: 50%
+    minAvailable: ""
+  podAnnotations: {}
+  priorityClassName: ""
+  ratelimit: null
+  reloadOnConfigChange: true
+  replicaCount: 1
+  replicatCount: 2
+  reporters:
+    elasticsearch:
+      enabled: true
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  service:
+    externalPort: 82
+    externalTrafficPolicy: Cluster
+    internalPort: 8082
+    internalPortName: http
+    type: ClusterIP
+  services:
+    bridge:
+      enabled: false
+      ingress:
+        annotations: {}
+        enabled: false
+        hosts:
+        - apim.example.com
+        ingressClassName: ""
+        path: /_bridge
+        pathType: Prefix
+      service:
+        externalPort: 92
+        internalPort: 18092
+      ssl:
+        enabled: false
+    core:
+      http:
+        authentication:
+          password: adminadmin
+          type: basic
+        enabled: true
+        host: 0.0.0.0
+        port: 18082
+        secured: false
+        ssl:
+          keystore:
+            path: /p12/keystore
+            type: PKCS12
+      ingress:
+        annotations: {}
+        enabled: false
+        hosts:
+        - apim.example.com
+        ingressClassName: ""
+        path: /_(.*)
+        pathType: Prefix
+      service:
+        enabled: false
+    metrics:
+      enabled: false
+      prometheus:
+        enabled: true
+    sync:
+      cron: '*/5 * * * * *'
+    tracing:
+      enabled: false
+      jaeger:
+        host: localhost
+        port: 14250
+      type: jaeger
+  sharding_tags: external
+  ssl:
+    clientAuth: false
+    enabled: false
+  terminationGracePeriod: 30
+  type: Deployment
+  websocket: false
+graviteeRepoAuth:
+  enabled: true
+inMemoryAuth:
+  allowEmailInSearchResults: false
+  enabled: true
+  passwordEncodingAlgo: bcrypt
+initContainers:
+  env: []
+  image: alpine:latest
+  imagePullPolicy: Always
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+installation:
+  api:
+    url: null
+  standalone:
+    console:
+      urls: null
+    portal:
+      urls: null
+  type: standalone
+jdbc:
+  driver: https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.22/mysql-connector-java-8.0.22.jar
+  liquibase: true
+  password: null
+  pool:
+    autoCommit: true
+    connectionTimeout: 10000
+    idleTimeout: 600000
+    maxLifetime: 1800000
+    maxPoolSize: 10
+    minIdle: 10
+    registerMbeans: true
+  schema: public
+  url: jdbc:mysql://localhost:3306/gravitee
+  username: null
+jwtSecret: myJWT4Gr4v1t33_S3cr3t
+ldap:
+  authentication:
+    group:
+      base: ou=gravitee,ou=groups
+      filter: member={0}
+      role:
+        admin: LDAP_GROUP_ADMIN
+        attribute: sAMAccountName
+        consumer: LDAP_GROUP_CONSUMER
+        publisher: LDAP_GROUP_PUBLISHER
+        user: LDAP_GROUP_USER
+    user:
+      base: ou=users
+      filter: sAMAccountName={0}
+      photo: thumbnailPhoto
+  context:
+    base: dc=example,dc=com
+    password: pass@12345
+    url: ldap://ldap.example.com
+    user: user@example.com
+  enabled: false
+  lookup:
+    allowEmailInSearchResults: false
+    user:
+      base: ou=users
+      filter: (&(objectClass=person)(|(cn=*{0}*)(sAMAccountName={0})))
+license:
+  key: '''Ic5OXgAAACAAAAACAAAADAAAAAhhbGVydC1lbmdpbmVpbmNsdWRlZAAAACwAAAACAAAABwAAABljb21wYW55R3Jhdml0ZWUuaW8gVHJpYWwgTGljZW5zZQAAACkAAAACAAAABQAAABhlbWFpbHNhbGVzQGdyYXZpdGVlc291cmNlLmNvbQAAABoAAAALAAAACmV4cGlyeURhdGUAAAGQin2D/wAAABQAAAACAAAACAAAAABmZWF0dXJlcwAAACEAAAAMAAAACWxpY2Vuc2VJZLNbr9hwuBxKRbAMsqO1S78AAAEcAAAAAQAAABAAAAEAbGljZW5zZVNpZ25hdHVyZcMr+pZVJeL7nMDeKXUao2oi/OMG4jj5iFGvxdCV+suzoZ1IYdeqOX5Vx9dymvJw+1TSMmH4DvtCJ68AoHpPZrwajfb4XjnzXiWbgZK1bVsvbUV47j9Ac1fUo1Fl5FgQfgVtRYy3WH/QSwJAbLs4IltcGr5G+ASqcZgnxIEwzpYEswnZItuOoBEzwazXYDYJ8edZUskt+2k/16d1AkTG/RaxEhMpBGU7XNJJcgyyEG+CXFq0lWx/8ov0bo8SzOSsmIjqG44dsVJLzSY1utloTWiFsNkcxpchvZU7BZeNrFaq9QjKFjAgn6rzwr8XG0l6AAzMBJtqEuqhFmTFbmc8m48AAAARAAAAAgAAAAUAAAAAcGFja3MAAAAiAAAAAgAAAA8AAAAHc2lnbmF0dXJlRGlnZXN0U0hBLTI1NgAAABgAAAACAAAABAAAAAh0aWVydW5pdmVyc2U='''
+  name: licensekey-apim
+management:
+  type: mongodb
+mongo:
+  auth:
+    enabled: false
+    password: null
+    source: admin
+    username: null
+  connectTimeoutMS: 30000
+  dbhost: graviteeio-apim-mongodb-replicaset-headless
+  dbname: gravitee
+  dbport: 27017
+  rs: rs0
+  rsEnabled: true
+  socketKeepAlive: false
+  sslEnabled: false
+  uri: mongodb://graviteeio-apim-mongodb-replicaset-headless:27017/gravitee?replicaset=rs0&connectTimeoutMS=30000
+mongodb:
+  architecture: replicaset
+  auth:
+    enabled: false
+  enabled: false
+  fullnameOverride: graviteeio-apim-mongodb-replicaset
+  image:
+    repository: bitnami/mongodb
+    tag: 6.0.13
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    enabled: true
+    size: 1Gi
+  podAffinityPreset: soft
+  replicaSetName: rs0
+  resources:
+    limits:
+      cpu: 1
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+networkPolicy: null
+notifiers:
+  smtp:
+    enabled: true
+    from: ${email.from}
+    host: ${email.host}
+    password: ${email.password}
+    port: ${email.port}
+    subject: ${email.subject}
+    username: ${email.username}
+oidcAuth:
+  enabled: false
+openshift:
+  enabled: false
+portal:
+  autoscaling:
+    enabled: true
+    maxReplicas: 3
+    minReplicas: 1
+    targetAverageUtilization: 50
+    targetMemoryAverageUtilization: 80
+  deployment:
+    affinity: {}
+    annotations: {}
+    customLivenessProbe: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    envFrom: []
+    hostAliases: []
+    labels: {}
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 30
+    nodeSelector:
+      kubernetes.io/os: linux
+    podSecurityContext: null
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 30
+    securityContext:
+      runAsGroup: 101
+      runAsNonRoot: true
+      runAsUser: 101
+    startupProbe:
+      enabled: false
+    strategy:
+      rollingUpdate:
+        maxUnavailable: 1
+      type: RollingUpdate
+    tolerations: []
+    topologySpreadConstraints: []
+  enabled: true
+  env: []
+  image:
+    pullPolicy: Always
+    repository: graviteeio/apim-portal-ui
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        etag on;
+        proxy_pass_header ETag;
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    enabled: true
+    hosts:
+    - ihm-gravitee.plt.mobility-solutions.fr
+    ingressClassName: dmz-nginx
+    path: /
+    pathType: Prefix
+    tls:
+    - hosts:
+      - ihm-gravitee.plt.mobility-solutions.fr
+      secretName: public-certificate
+  lifecycle:
+    preStop: '[''sh'',''-c'', ''sleep 5 && /usr/sbin/nginx -s quit'']'
+  name: portal
+  pdb:
+    enabled: false
+    maxUnavailable: 50%
+    minAvailable: ""
+  podAnnotations: {}
+  priorityClassName: ""
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  service:
+    externalPort: 8003
+    externalTrafficPolicy: Cluster
+    internalPort: 8080
+    internalPortName: http
+    name: nginx
+    type: ClusterIP
+  terminationGracePeriod: 30
+ratelimit:
+  type: mongodb
+redis:
+  download: true
+security:
+  providers: []
+  trustAll: false
+smtp:
+  enabled: true
+ui:
+  autoscaling:
+    enabled: true
+    maxReplicas: 3
+    minReplicas: 1
+    targetAverageUtilization: 50
+    targetMemoryAverageUtilization: 80
+  companyName: Gravitee.io
+  deployment:
+    affinity: {}
+    annotations: {}
+    customLivenessProbe: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    envFrom: []
+    hostAliases: []
+    labels: {}
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 30
+    nodeSelector:
+      kubernetes.io/os: linux
+    podSecurityContext: null
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      httpGet:
+        path: /
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 30
+    securityContext:
+      runAsGroup: 101
+      runAsNonRoot: true
+      runAsUser: 101
+    startupProbe:
+      enabled: false
+    strategy:
+      rollingUpdate:
+        maxUnavailable: 1
+      type: RollingUpdate
+    tolerations: []
+    topologySpreadConstraints: []
+  documentationLink: https://documentation.gravitee.io/
+  enabled: true
+  env: []
+  image:
+    pullPolicy: Always
+    repository: graviteeio/apim-management-ui
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        etag on;
+        proxy_pass_header ETag;
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+    enabled: true
+    hosts:
+    - ihm-gravitee.plt.mobility-solutions.fr
+    ingressClassName: dmz-nginx
+    path: /console(/.*)?
+    pathType: Prefix
+    tls:
+    - hosts:
+      - ihm-gravitee.plt.mobility-solutions.fr
+      secretName: public-certificate
+  lifecycle:
+    preStop: '[''sh'',''-c'', ''sleep 5 && /usr/sbin/nginx -s quit'']'
+  managementTitle: API Management
+  name: ui
+  pdb:
+    enabled: false
+    maxUnavailable: 50%
+    minAvailable: ""
+  podAnnotations: {}
+  portal:
+    analytics:
+      enabled: false
+      trackingId: ""
+    apikeyHeader: X-Gravitee-Api-Key
+    rating:
+      enabled: false
+    support:
+      enabled: true
+    userCreation:
+      enabled: false
+  priorityClassName: ""
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  scheduler:
+    tasks: 10
+  service:
+    externalPort: 8002
+    externalTrafficPolicy: Cluster
+    internalPort: 8080
+    internalPortName: http
+    name: nginx
+    type: ClusterIP
+  terminationGracePeriod: 30
+  theme:
+    loader: assets/gravitee_logo_anim.gif
+    logo: themes/assets/GRAVITEE_LOGO1-01.png
+    name: default
+  title: Management UI

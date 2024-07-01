@@ -1,0 +1,48 @@
+# Deploy an elasticsearch cluster.
+elasticsearch:
+  enabled: true
+
+# Elasticsearch uri, do not change.
+es:
+  endpoints:
+    - http://graviteeio-apim-elasticsearch-ingest-hl:9200
+
+# Deploy a mongoDB cluster.
+mongodb:
+  enabled: true
+
+# MongoDB uri, do not change.
+mongo:
+  uri: mongodb://graviteeio-apim-mongodb-replicaset-headless:27017/gravitee?replicaset=rs0&connectTimeoutMS=30000
+
+# Change the ingress host with your host domain.
+# no TLS provided here. Check the documentation if needed.
+api:
+  ingress:
+    management:
+      hosts:
+        - gravitee-apim.toto.svc.cluster.local
+    portal:
+      hosts:
+        - gravitee-apim.toto.svc.cluster.local
+
+# Change the ingress host with your host domain.
+# no TLS provided here. Check the documentation if needed.
+gateway:
+  ingress:
+    hosts:
+      - gravitee-apim-gateway.toto.svc.cluster.local
+
+# Change the ingress host with your host domain.
+# no TLS provided here. Check the documentation if needed.
+portal:
+  ingress:
+    hosts:
+      - gravitee-apim-portal.toto.svc.cluster.local
+
+# Change the ingress host with your host domain.
+# no TLS provided here. Check the documentation if needed.
+ui:
+  ingress:
+    hosts:
+      - gravitee-apim-ui.toto.svc.cluster.local
