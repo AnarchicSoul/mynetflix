@@ -24,12 +24,15 @@ pipeline {
         }
     }
     stages {
+        stage('SCM') {
+            checkout scm
+        }
         stage('Run maven') {
             steps {
                 container('maven') {
                     sh 'mvn -version'
                     withSonarQubeEnv(installationName:'sonar') {
-                        sh ''''mvn clean verify sonar:sonar -Dsonar.projectKey=test2 -Dsonar.projectName='test2' -Dsonar.host.url=http://sonaqube-sonarqube:9000''''
+                        sh "clean verify sonar:sonar -Dsonar.projectKey=test2 -Dsonar.projectName='test2'"
                     }
                 }
             }
