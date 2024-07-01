@@ -28,16 +28,9 @@ pipeline {
             steps {
                 container('maven') {
                     sh 'mvn -version'
-                }
-                container('busybox') {
-                    sh '/bin/busybox'
-                }
-            }
-        }
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv(installationName:'sonar') {
-                    sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                    withSonarQubeEnv(installationName:'sonar') {
+                        sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                    }
                 }
             }
         }
