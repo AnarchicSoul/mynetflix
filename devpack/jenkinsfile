@@ -1,11 +1,45 @@
 pipeline {
-    agent any
-
+    agent {
+        kubernetes {
+            yaml '''
+                apiVersion: v1
+                kind: Pod
+                metadata:
+                  labels:
+                    some-label: some-label-value
+                spec:
+                  containers:
+                  - name: maven
+                    image: maven:alpine
+                    command:
+                    - cat
+                    tty: true
+                  - name: busybox
+                    image: busybox
+                    command:
+                    - cat
+                    tty: true
+                '''
+            retries 2
+        }
+    }
+    stages {
+        stage('Run maven') {
+            steps {
+                container('maven') {
+                    sh 'mvn -version'
+                }
+                container('busybox') {
+                    sh '/bin/busybox'
+                }
+            }
+        }
+    }
     stages {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv(installationName:'sonar') {
-                    sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                    sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
                 }
             }
         }
