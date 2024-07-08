@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-app
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-app
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      containers:
+        - name: myapp-container
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          command: ["/bin/sh", "-c", "cat <<EOF > /app/kubeconfig2 && tail -f /dev/null
+apiVersion: v1
+kind: Config
+clusters:
+- name: my-cluster
+  cluster:
+    certificate-authority: /app/token/ca.crt
+    server: https://kubernetes.docker.internal:6443
+contexts:
+- name: my-context
+  context:
+    cluster: my-cluster
+    namespace: $(cat /app/token/namespace)
+    user: restricted-sa
+current-context: my-context
+users:
+- name: restricted-sa
+  user:
+    token: $(cat /app/token/token)
+EOF"]
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: kubeconfig-volume
+              mountPath: "/app/generate"
+            - name: kubeconfig
+              mountPath: "/app/token"
+      volumes:
+        - name: kubeconfig
+          secret:
+            secretName: {{ .Values.kubeconfigSecret.name }}
+        - name: kubeconfig-volume
+          configMap:
+            name: generate-kubeconfig-script  # Nom du ConfigMap
+            items:
+              - key: generate_kubeconfig.sh
+                path: generate_kubeconfig.sh

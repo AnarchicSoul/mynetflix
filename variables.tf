@@ -38,6 +38,11 @@ locals {
 
 
 ## Kube prometheus stack config
+variable "prometheus" {
+    description = "enable = true & disable = false"
+    type        = bool
+    default     = false
+} 
 variable "grafana_password" {
     description = "Type grafana password"
     type        = string
@@ -63,7 +68,7 @@ locals {
 variable "keycloak" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = true
+    default     = false
 } 
 variable "keycloak_password" {
     description = "Type keycloak password"
@@ -107,6 +112,23 @@ variable "jenkins_password" {
 locals {
     jenkins_host    = "${yamldecode(file("config.yaml")).app.jenkins.jenkins_host}"
     jenkins_ingress = "${local.jenkins_host}.${local.mydomain}"
+}
+## sonarqube Config
+variable "sonarqube" {
+    description = "enable = true & disable = false"
+    type        = bool
+    default     = false
+}  
+variable "sonarqube_password" {
+    description = "Type sonarqube password"
+    type        = string
+    sensitive   = true
+    # remove default if you want secure password 
+    default     = "admintoto"
+}  
+locals {
+    sonarqube_host    = "${yamldecode(file("config.yaml")).app.sonarqube.sonarqube_host}"
+    sonarqube_ingress = "${local.sonarqube_host}.${local.mydomain}"
 }
 
 ## homer Config

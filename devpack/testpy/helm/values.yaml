@@ -1,0 +1,28 @@
+namespace: default
+
+serviceAccount:
+  create: true
+  name: my-service-account
+
+kubeconfigSecret:
+  name: secure-sa-token
+
+kubeconfigSecretName: secure-sa-kubeconfig
+kubernetesAPIHost: "https://kubernetes.docker.internal:6443"
+
+image:
+  repository: "johan91/testpy"
+  tag: "latest"
+  pullPolicy: "IfNotPresent"
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: testpy.localhost
+      paths:
+        - path: /
+          backend:
+            serviceName: myapp-service
+            servicePort: 80

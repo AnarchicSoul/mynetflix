@@ -37,13 +37,15 @@ keycloakConfigCli:
           "realm": "realm1",
           "enabled": true,
           "clients": [
-            ${local.client_prometheus}
-            ${local.client_grafana}
-            ${local.client_mailhog}
-            ${local.client_kubeshark}
-            ${var.homer ? local.client_homer : ""}
+            ${var.prometheus ? local.client_prometheus : ""}
+            ${var.prometheus ? local.client_grafana : ""}
+            ${var.prometheus ? local.client_alertmanager : ""}
+            ${var.prometheus ? local.client_mailhog : ""}
+            ${var.prometheus ? local.client_kubeshark : ""}
+            ${var.prometheus ? local.client_homer : ""}
             ${var.jenkins ? local.client_jenkins : ""}
-            ${local.client_alertmanager}
+            ${var.sonarqube ? local.client_sonarqube : ""}
+            ${local.client_fake}
           ],
           "users": [
             {
@@ -62,6 +64,11 @@ keycloakConfigCli:
             }
           ]
         }
+metrics:
+  serviceMonitor:
+    enabled: ${var.prometheus ? "true" : "false"}
+  prometheusRule:
+    enabled: ${var.prometheus ? "true" : "false"}
   EOT
 }
 

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mt-5">Edit SFTP Config</h2>
+    <form method="post" class="mt-4">
+        {% for key, value in secret_data.items() %}
+            <div class="form-group">
+                <label for="{{ key }}">{{ key }}</label>
+                <input type="text" class="form-control" id="{{ key }}" name="{{ key }}" value="{{ value }}">
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Apply Changes</button>
+    </form>
+</div>
+{% endblock %}

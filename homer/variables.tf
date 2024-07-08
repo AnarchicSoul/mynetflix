@@ -34,6 +34,12 @@ variable "jenkins" {
 variable "jenkins_ingress" {
     type        = string
 }  
+variable "sonarqube" {
+    type        = bool
+} 
+variable "sonarqube_ingress" {
+    type        = string
+}  
 variable "namespace" {
     type = string
 }  

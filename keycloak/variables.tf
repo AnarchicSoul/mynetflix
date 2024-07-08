@@ -10,6 +10,9 @@ variable "namespace" {
 variable "keycloak_ingress" {
     type        = string
 }  
+variable "prometheus" {
+    type        = bool
+}  
 variable "grafana_ingress" {
     type        = string
 }  
@@ -29,6 +32,12 @@ variable "jenkins" {
     type        = bool
 }  
 variable "jenkins_ingress" {
+    type        = string
+}  
+variable "sonarqube" {
+    type        = bool
+}  
+variable "sonarqube_ingress" {
     type        = string
 }  
 variable "homer" {

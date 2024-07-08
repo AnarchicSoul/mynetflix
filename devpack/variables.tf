@@ -16,3 +16,15 @@ variable "keycloak_ingress" {
 variable "keycloak" {
     type        = bool
 } 
+variable "prometheus" {
+    type        = bool
+} 
+variable "sonarqube" {
+    type        = bool
+} 
+variable "sonarqube_password" {
+    type        = string
+}  
+variable "sonarqube_ingress" {
+    type        = string
+}  

@@ -1,22 +1,22 @@
 locals {
-  client_alertmanager = <<-EOT
+  client_sonarqube = <<-EOT
   {
-                "clientId": "alertmanager",
+                "clientId": "sonarqube",
                 "name": "",
                 "description": "",
-                "rootUrl": "https://${var.alert_ingress}/",
-                "adminUrl": "https://${var.alert_ingress}/",
-                "baseUrl": "https://${var.alert_ingress}/",
+                "rootUrl": "https://${var.sonarqube_ingress}/",
+                "adminUrl": "https://${var.sonarqube_ingress}/",
+                "baseUrl": "https://${var.sonarqube_ingress}/",
                 "surrogateAuthRequired": false,
                 "enabled": true,
                 "alwaysDisplayInConsole": false,
                 "clientAuthenticatorType": "client-secret",
                 "secret": "z4Ux09d1GrR5GVUMleJVSPwYkDFdiaxZ",
                 "redirectUris": [
-                "https://${var.alert_ingress}/*"
+                "https://${var.sonarqube_ingress}/*"
                 ],
                 "webOrigins": [
-                "https://${var.alert_ingress}"
+                "https://${var.sonarqube_ingress}"
                 ],
                 "notBefore": 0,
                 "bearerOnly": false,
@@ -32,7 +32,7 @@ locals {
                 "oidc.ciba.grant.enabled": "false",
                 "client.secret.creation.time": "1719221050",
                 "backchannel.logout.session.required": "true",
-                "post.logout.redirect.uris": "https://${var.alert_ingress}/*",
+                "post.logout.redirect.uris": "https://${var.sonarqube_ingress}/*",
                 "oauth2.device.authorization.grant.enabled": "false",
                 "display.on.consent.screen": "false",
                 "backchannel.logout.revoke.offline.tokens": "false",

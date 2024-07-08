@@ -64,19 +64,16 @@ Job :
   -- protect with oauth2-proxy
 
 Limitations:
-Disabling prometheus and enabling keycloak is not possible or will crash (comma issue)
 Only working for docker-desktop for the moment 
 Impossible (or too hard) to automatize sonarqube project creation with token. Same for jenkins pipeline. Will need to follow memo
 Sonaqube cannot be plug to keycloak. Will use oauth2 but it will have a doble authent... 
+problème sur le deployment.yaml
 
 TODO - INIT (DEV): 
-prometheus true/false
+create namespace dev et service account dev with full dev mais pas le reste
 config sonarqube + jenkins
-  true/false
-  set password 
   set keycloak oauth2 
   image ubuntu/debian -> openssh service --> terra ansible connect ssh et manage sonar et jenkins 
-déployer mongodb
 déployer argocd
 test API full CI/CD
   CI - sonar scan git
@@ -88,6 +85,7 @@ Rename project (git repo)
 
 TODO - V2 (VS): 
 install gravitee > pas possible trops de CPU -> APISIX pas possible car localhost pris.  // disable docker desktop
+déployer mongodb (https://github.com/AnarchicSoul/python/tree/backup)
 déployer elastic + postgresql (gravitee = mongo et elastic / keycloak et sonaqube = postgrsql) // disable docker desktop
 Deploy Harbor with Trivy and image scan
 Deploy KubeScan

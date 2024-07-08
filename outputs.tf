@@ -10,6 +10,10 @@ output "jenkinspass" {
   value = var.jenkins ? module.devpack[0].jenkinspass : null
   sensitive = true
 }
+output "sonarqubepass" {
+  value = var.sonarqube ? module.devpack[0].sonarqubepass : null
+  sensitive = true
+}
 output "grafanapass" {
   value = nonsensitive(var.grafana_password)
   sensitive = true

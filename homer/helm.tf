@@ -17,18 +17,8 @@ resource "helm_release" "homer" {
 
 
 locals {
-  homer_config = <<-EOT
-    configmap:
-      config:
-        enabled: true
-        data:
-          config.yml: |
-            title: "My Home Routing"
-            subtitle: "Duval Johan"
-            header: true
-            footer: false # set false if you want to hide it.
-            services:
-              - name: "Monitoring"
+  monitoring_conf = <<-EOT
+    - name: "Monitoring"
                 items:
                   - name: "Prometheus"
                     url: "https://${var.prometheus_ingress}"
@@ -40,9 +30,23 @@ locals {
                     url: "https://${var.mailhog_ingress}"
                   - name: "Kubeshark"
                     url: "https://${var.kubeshark_ingress}"
+  EOT
+  homer_config = <<-EOT
+    configmap:
+      config:
+        enabled: true
+        data:
+          config.yml: |
+            title: "My Home Routing"
+            subtitle: "Duval Johan"
+            header: true
+            footer: false # set false if you want to hide it.
+            services:
+              ${var.keycloak ? local.monitoring_conf : ""}
               ${var.keycloak ? "- name: \"Security\"\n            items:\n              - name: \"Keycloak\"\n                url: \"https://${var.keycloak_ingress}\"" : ""}
               ${var.devpack ? "- name: \"Devpack\"\n            items:" : ""}
                   ${var.jenkins ? "- name: \"jenkins\"\n                url: \"https://${var.jenkins_ingress}\"" : ""}
+                  ${var.sonarqube ? "- name: \"sonarqube\"\n                url: \"https://${var.sonarqube_ingress}\"" : ""}
               - name: "My Apps"
                 items:
                   - name: "Homer"
