@@ -17,6 +17,8 @@ baseconfig:
 app:
   jenkins:
     jenkins_host: "jenkins"
+  myapp:
+    myapp_host: "myapp"
   homer:
     homer_host: "homer"
   sonarqube:

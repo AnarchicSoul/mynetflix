@@ -75,7 +75,7 @@ resource "helm_release" "sonarqube" {
 } 
 
 resource "helm_release" "oauth_sonarqube" {
-  count = var.keycloak ? 1 : 0
+  count = var.keycloak && var.sonarqube ? 1 : 0
   depends_on = [helm_release.sonarqube]
   name       = "sonarqube"
   namespace  = var.namespace
@@ -124,22 +124,82 @@ locals {
   EOT
 }
 
-#resource "kubernetes_secret" "myapp" {
-#  metadata {
-#    name = "kubeconfig-secret"
-#    namespace  = var.namespace
-#  }
-#
-#  data = {
-#    "kubeconfig" = "${file("./k8s-cluster/kubeconfig")}"
-#  }
-#
-#  type = "opaque"
-#}
 
-#resource "helm_release" "myapp" {
-#  #depends_on = [kubernetes_secret.myapp]
-#  name       = "myapp"
-#  namespace  = var.namespace
-#  chart      = "./devpack/testpy/helm"
-#} 
+## TEMP APP POST INSTALL
+resource "kubernetes_secret" "myapp" {
+  metadata {
+    name = "ntt-data"
+    namespace  = var.namespace
+  }
+
+  data = {
+    "user" = "toto"
+    "password" = "super_toto"
+  }
+
+  type = "opaque"
+}
+
+resource "helm_release" "myapp" {
+  count = var.myapp ? 1 : 0
+  depends_on = [kubernetes_secret.myapp]
+  name       = "myapp-app"
+  namespace  = var.namespace
+  chart      = "./devpack/testpy/myapp-0.13.0.tgz"
+  values = [
+    var.keycloak ? local.myapp_noconfig : local.myapp_config
+  ]
+} 
+
+resource "helm_release" "oauth_myapp" {
+  count = var.keycloak && var.myapp ? 1 : 0
+  depends_on = [helm_release.myapp]
+  name       = "myapp"
+  namespace  = var.namespace
+  chart      = "./keycloak/oauth2/oauth2-proxy-7.7.4.tgz"
+  version    = "7.7.4"
+  values = [
+    "${file("./keycloak/oauth2/values.yaml")}",
+    local.myapp_oauth
+  ]
+} 
+
+locals {
+  myapp_config = <<-EOT
+    ingress:
+      enabled: true
+      hosts:
+        - host: ${var.myapp_ingress}
+          paths:
+            - path: /
+              backend:
+                serviceName: myapp-app-service
+                servicePort: 80
+      tls:
+        - secretName: wildcard-cert
+          hosts:
+            - ${var.myapp_ingress}
+  EOT
+
+  myapp_noconfig = <<-EOT
+    ingress:
+      enabled: false
+  EOT
+  
+  myapp_oauth = <<-EOT
+    ingress:
+      hosts:
+        - ${var.myapp_ingress}
+      tls: 
+        - secretName: wildcard-cert
+          hosts:
+          - ${var.myapp_ingress}
+    extraArgs:
+      client-id: myapp
+      login-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/auth" 
+      redeem-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/token"
+      profile-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo" 
+      validate-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo"
+      upstream: "http://myapp-app-service.${var.namespace}.svc.cluster.local:80"
+  EOT
+}

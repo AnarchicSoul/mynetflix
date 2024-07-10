@@ -68,7 +68,7 @@ locals {
 variable "keycloak" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = false
+    default     = true
 } 
 variable "keycloak_password" {
     description = "Type keycloak password"
@@ -100,7 +100,7 @@ locals {
 variable "jenkins" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = true
+    default     = false
 }  
 variable "jenkins_password" {
     description = "Type jenkins password"
@@ -135,9 +135,20 @@ locals {
 variable "homer" {
     description = "enable = true & disable = false"
     type        = bool
-    default     = true
+    default     = false
 }  
 locals {
     homer_host    = "${yamldecode(file("config.yaml")).app.homer.homer_host}"
     homer_ingress = "${local.homer_host}.${local.mydomain}"
+}
+
+## myapp Config
+variable "myapp" {
+    description = "enable = true & disable = false"
+    type        = bool
+    default     = true
+}  
+locals {
+    myapp_host    = "${yamldecode(file("config.yaml")).app.myapp.myapp_host}"
+    myapp_ingress = "${local.myapp_host}.${local.mydomain}"
 }

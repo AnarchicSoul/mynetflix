@@ -46,3 +46,9 @@ variable "homer" {
 variable "homer_ingress" {
     type        = string
 }  
+variable "myapp" {
+    type        = bool
+}  
+variable "myapp_ingress" {
+    type        = string
+}  

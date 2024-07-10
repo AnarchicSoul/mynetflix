@@ -1,8 +1,14 @@
-namespace: default
+namespace: toto
 
 serviceAccount:
   create: true
   name: my-service-account
+
+role:
+  name: my-role
+
+roleBinding:
+  name: my-role-binding
 
 kubeconfigSecret:
   name: secure-sa-token
@@ -12,7 +18,7 @@ kubernetesAPIHost: "https://kubernetes.docker.internal:6443"
 
 image:
   repository: "johan91/testpy"
-  tag: "latest"
+  tag: "v13"
   pullPolicy: "IfNotPresent"
 
 ingress:
@@ -24,5 +30,5 @@ ingress:
       paths:
         - path: /
           backend:
-            serviceName: myapp-service
+            serviceName: myapp-app-service
             servicePort: 80

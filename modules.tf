@@ -48,6 +48,8 @@ module "keycloak" {
     sonarqube_ingress  = local.sonarqube_ingress
     homer  = var.homer
     homer_ingress  = local.homer_ingress
+    myapp  = var.myapp
+    myapp_ingress  = local.myapp_ingress
     depends_on = [module.prometheus]
 }
 
@@ -60,6 +62,8 @@ module "devpack" {
     sonarqube_password  = var. sonarqube_password
     sonarqube  = var.sonarqube
     sonarqube_ingress  = local.sonarqube_ingress
+    myapp  = var.myapp
+    myapp_ingress  = local.myapp_ingress
     password  = var.jenkins_password
     jenkins_ingress  = local.jenkins_ingress
     keycloak_ingress  = local.keycloak_ingress

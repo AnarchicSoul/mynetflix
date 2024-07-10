@@ -43,6 +43,7 @@ keycloakConfigCli:
             ${var.prometheus ? local.client_mailhog : ""}
             ${var.prometheus ? local.client_kubeshark : ""}
             ${var.prometheus ? local.client_homer : ""}
+            ${var.myapp ? local.client_myapp : ""}
             ${var.jenkins ? local.client_jenkins : ""}
             ${var.sonarqube ? local.client_sonarqube : ""}
             ${local.client_fake}

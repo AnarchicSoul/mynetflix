@@ -1,0 +1,34 @@
+namespace: toto
+
+serviceAccount:
+  create: true
+  name: my-service-account
+
+role:
+  name: my-role
+
+roleBinding:
+  name: my-role-binding
+
+kubeconfigSecret:
+  name: secure-sa-token
+
+kubeconfigSecretName: secure-sa-kubeconfig
+kubernetesAPIHost: "https://kubernetes.docker.internal:6443"
+
+image:
+  repository: "johan91/testpy"
+  tag: "v13"
+  pullPolicy: "IfNotPresent"
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: testpy.localhost
+      paths:
+        - path: /
+          backend:
+            serviceName: myapp-service
+            servicePort: 80

@@ -67,12 +67,9 @@ Limitations:
 Only working for docker-desktop for the moment 
 Impossible (or too hard) to automatize sonarqube project creation with token. Same for jenkins pipeline. Will need to follow memo
 Sonaqube cannot be plug to keycloak. Will use oauth2 but it will have a doble authent... 
-problème sur le deployment.yaml
 
 TODO - INIT (DEV): 
-create namespace dev et service account dev with full dev mais pas le reste
 config sonarqube + jenkins
-  set keycloak oauth2 
   image ubuntu/debian -> openssh service --> terra ansible connect ssh et manage sonar et jenkins 
 déployer argocd
 test API full CI/CD
@@ -115,3 +112,4 @@ prometheus:
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
+

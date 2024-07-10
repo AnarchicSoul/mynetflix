@@ -1,12 +1,25 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from kubernetes import client, config
 import base64
+import yaml
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 # Chemin vers le kubeconfig dans l'application Docker
 kubeconfig_path = '/app/kubeconfig'
+
+with open(kubeconfig_path, 'r') as f:
+  kubeconfig = yaml.safe_load(f)
+
+current_context = kubeconfig.get('current-context')
+
+for context in kubeconfig.get('contexts', []):
+  if context.get('name') == current_context:
+    namespace = context.get('context', {}).get('namespace')
+    break
+  else:
+    namespace = 'default'
 
 @app.route('/')
 def index():
@@ -27,14 +40,14 @@ def edit():
         
         try:
             # Lire le secret existant
-            secret = v1.read_namespaced_secret('ntt-data', 'default')
+            secret = v1.read_namespaced_secret('ntt-data', namespace)
             
             # Mettre à jour les valeurs du secret avec les nouvelles données
             for key, value in new_data.items():
                 secret.data[key] = base64.b64encode(value.encode('utf-8')).decode('utf-8')
             
             # Appliquer les modifications au secret
-            v1.replace_namespaced_secret('ntt-data', 'default', secret)
+            v1.replace_namespaced_secret('ntt-data', namespace, secret)
             
             flash('Les modifications ont été appliquées avec succès.', 'success')
         except Exception as e:
@@ -47,7 +60,7 @@ def edit():
     
     # Accéder aux secrets Kubernetes
     v1 = client.CoreV1Api()
-    secret = v1.read_namespaced_secret('ntt-data', 'default')
+    secret = v1.read_namespaced_secret('ntt-data', namespace)
     
     # Décoder les données du secret
     secret_data = {}
