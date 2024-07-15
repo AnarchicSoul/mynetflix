@@ -1,15 +1,17 @@
+{{- if .Values.testpy.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
+  namespace: {{ .Values.testpy.namespace }}
   annotations:
-    {{- range $key, $value := .Values.ingress.annotations }}
+    {{- range $key, $value := .Values.testpy.ingress.annotations }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
   ingressClassName: nginx
   rules:
-    {{- range $host := .Values.ingress.hosts }}
+    {{- range $host := .Values.testpy.ingress.hosts }}
     - host: {{ $host.host | quote }}
       http:
         paths:
@@ -23,3 +25,4 @@ spec:
                   number: {{ $path.backend.servicePort }}
           {{- end }}
     {{- end }}
+{{- end }}

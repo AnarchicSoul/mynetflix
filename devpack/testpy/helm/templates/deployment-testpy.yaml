@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "myapp.fullname" . }}
+  namespace: {{ .Values.testpy.namespace }}
+  labels:
+    {{- include "myapp.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp-app  # Assurez-vous que c'est le bon label utilisé dans les pods
+  template:
+    metadata:
+      labels:
+        app: myapp-app  # Assurez-vous que c'est le bon label utilisé dans les pods
+        {{- include "myapp.selectorLabels" . | nindent 8 }}
+    spec:
+      #serviceAccountName: {{ .Values.testpy.serviceAccount.name }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.testpy.image.repository }}:{{ .Values.testpy.image.tag }}"
+          imagePullPolicy: {{ .Values.testpy.image.pullPolicy }}
+          env:
+            - name: KUBERNETES_API_HOST
+              value: {{ .Values.testpy.kubernetesAPIHost }}
+            - name: kubeusername
+              value: {{ .Values.testpy.serviceAccount.name }}
+            - name: namespacesecure
+              value: {{ .Values.testpy.namespace }}
+            - name: nsatlas
+              value: {{ .Values.testpy.nsatlas }}
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              cat <<EOF > /app/kubeconfig
+              apiVersion: v1
+              kind: Config
+              clusters:
+              - name: kube
+                cluster:
+                  certificate-authority: /app/token/ca.crt
+                  server: $(printenv KUBERNETES_API_HOST)
+              contexts:
+              - name: kube
+                context:
+                  cluster: kube
+                  namespace: $(printenv namespacesecure)
+                  user: $(printenv kubeusername)
+              current-context: kube
+              users:
+              - name: $(printenv kubeusername)
+                user:
+                  token: $(cat /app/token/token)
+              EOF
+              python app.py
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: kubeconfig
+              mountPath: "/app/token"
+      volumes:
+        - name: kubeconfig
+          secret:
+            secretName: {{ .Values.testpy.kubeconfigSecret.name }}

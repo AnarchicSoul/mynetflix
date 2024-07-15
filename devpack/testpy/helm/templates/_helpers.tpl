@@ -1,31 +1,19 @@
-{{/*
-Generate kubeconfig for service account
-*/}}
-{{- define "myapp.generateKubeconfig" -}}
-{{- printf "#!/bin/sh\n" -}}
-{{- printf "kubectl config set-cluster local --server=https://%s --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n" (include "myapp.getKubernetesAPIHost" .) -}}
-{{- printf "kubectl config set-credentials sa-%s --token=%s\n" .Release.Namespace (include "myapp.getServiceAccountToken" .) -}}
-{{- printf "kubectl config set-context local --cluster=local --user=sa-%s --namespace=%s\n" .Release.Namespace .Release.Namespace -}}
-{{- printf "kubectl config use-context local\n" -}}
+{{- define "myapp.fullname" -}}
+{{- printf "%s-%s" .Release.Name .Chart.Name -}}
 {{- end -}}
 
-{{/*
-Get Kubernetes API host
-*/}}
-{{- define "myapp.getKubernetesAPIHost" -}}
-{{- printf "%s" .Values.kubernetesAPIHost | quote -}}
+{{- define "myapp.labels" -}}
+app.kubernetes.io/name: {{ include "myapp.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/version: {{ .Chart.AppVersion }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{/*
-Get service account token
-*/}}
-{{- define "myapp.getServiceAccountToken" -}}
-{{- printf "%s" (include "myapp.executeServiceAccountToken" .) -}}
+{{- define "myapp.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "myapp.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{/*
-Execute script to get service account token
-*/}}
-{{- define "myapp.executeServiceAccountToken" -}}
-{{- printf "$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" -}}
+{{- define "myapp.name" -}}
+{{ .Chart.Name }}
 {{- end -}}

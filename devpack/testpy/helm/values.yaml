@@ -1,34 +1,47 @@
-namespace: toto
+testpy:
+  namespace: valm1-secure
+  nsatlas: valm1
+  serviceAccount:
+    create: true
+    name: atlas-secure
+  role:
+    create: true
+    name: role-atlas-secure
+  roleBinding:
+    create: true
+    name: rolebind-atlas-secure
+  kubernetesAPIHost: "https://kubernetes.docker.internal:6443"
+  kubeconfigSecret:
+    name: secure-sa-kubeconfig
+  image:
+    repository: "johan91/testpy"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    hosts:
+      - host: testpy.localhost
+        paths:
+          - path: /
+            backend:
+              serviceName: myapp-app-service
+              servicePort: 80
 
-serviceAccount:
-  create: true
-  name: my-service-account
-
-role:
-  name: my-role
-
-roleBinding:
-  name: my-role-binding
-
-kubeconfigSecret:
-  name: secure-sa-token
-
-kubeconfigSecretName: secure-sa-kubeconfig
-kubernetesAPIHost: "https://kubernetes.docker.internal:6443"
-
-image:
-  repository: "johan91/testpy"
-  tag: "v13"
-  pullPolicy: "IfNotPresent"
-
-ingress:
+secretSyncController:
   enabled: true
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-  hosts:
-    - host: testpy.localhost
-      paths:
-        - path: /
-          backend:
-            serviceName: myapp-app-service
-            servicePort: 80
+  namespace: valm1-secure
+  image:
+    repository: "johan91/secret-sync-controller"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  serviceAccount:
+    create: true
+    name: atlas-sync
+  role:
+    create: false
+    name: reflector
+  roleBinding:
+    create: true
+    name: atlas-reflector

@@ -1,0 +1,201 @@
+---
+# Source: myapp/templates/serviceaccount-secret-sync-controller.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: secret-sync-controller
+  namespace: valm1-secure
+---
+# Source: myapp/templates/serviceaccount-testpy.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: atlas
+  namespace: valm1
+---
+# Source: myapp/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secure-sa-kubeconfig
+  annotations:
+    kubernetes.io/service-account.name: atlas
+type: kubernetes.io/service-account-token
+---
+# Source: myapp/templates/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: secret-sync-controller
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch", "update"]
+---
+# Source: myapp/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: secret-sync-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secret-sync-controller
+subjects:
+  - kind: ServiceAccount
+    name: secret-sync-controller
+    namespace: valm1-secure
+---
+# Source: myapp/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role-atlas
+  namespace: valm1
+rules:
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+---
+# Source: myapp/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rolebind-atlas
+  namespace: valm1
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: role-atlas
+subjects:
+  - kind: ServiceAccount
+    name: atlas
+    namespace: valm1
+---
+# Source: myapp/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-service
+spec:
+  selector:
+    app: test-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+---
+# Source: myapp/templates/deployment-secret-sync-controller.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secret-sync-controller
+  namespace: valm1-secure
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: secret-sync-controller
+  template:
+    metadata:
+      labels:
+        app: secret-sync-controller
+    spec:
+      serviceAccountName: secret-sync-controller
+      containers:
+        - name: secret-sync-controller
+          image: "johan91/secret-sync-controller:latest"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE
+              value: valm1-secure
+---
+# Source: myapp/templates/deployment-testpy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-myapp
+  namespace: valm1
+  labels:
+    app.kubernetes.io/name: myapp
+    app.kubernetes.io/instance: test
+    app.kubernetes.io/version: 
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: myapp
+        app.kubernetes.io/instance: test
+    spec:
+      serviceAccountName: atlas
+      containers:
+        - name: myapp
+          image: "johan91/testpy:v1.0"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KUBERNETES_API_HOST
+              value: https://kubernetes.docker.internal:6443
+            - name: kubeusername
+              value: atlas
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              cat <<EOF > /app/kubeconfig
+              apiVersion: v1
+              kind: Config
+              clusters:
+              - name: kube
+                cluster:
+                  certificate-authority: /app/token/ca.crt
+                  server: $(printenv KUBERNETES_API_HOST)
+              contexts:
+              - name: kube
+                context:
+                  cluster: kube
+                  namespace: $(cat /app/token/namespace)
+                  user: $(printenv kubeusername)
+              current-context: kube
+              users:
+              - name: $(printenv kubeusername)
+                user:
+                  token: $(cat /app/token/token)
+              EOF
+              python app.py
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: kubeconfig
+              mountPath: "/app/token"
+      volumes:
+        - name: kubeconfig
+          secret:
+            secretName: secure-sa-kubeconfig
+---
+# Source: myapp/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress
+  namespace: valm1
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "testpy.localhost"
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: myapp-app-service
+                port:
+                  number: 80

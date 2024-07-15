@@ -1,0 +1,11 @@
+{{- if .Values.testpy.role.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.testpy.role.name }}
+  namespace: {{ .Values.testpy.namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["*"]
+{{- end }}

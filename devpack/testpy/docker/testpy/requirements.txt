@@ -1,0 +1,2 @@
+Flask
+kubernetes>=22.0.0

@@ -3,3 +3,4 @@ resource "kubernetes_namespace_v1" "example" {
     name = var.namespace
   }
 }
+

@@ -1,0 +1,21 @@
+{{- if .Values.secretSyncController.role.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.secretSyncController.role.name }}
+rules:
+  - verbs:
+      - '*'
+    apiGroups:
+      - ''
+    resources:
+      - configmaps
+      - secrets
+  - verbs:
+      - watch
+      - list
+    apiGroups:
+      - ''
+    resources:
+      - namespaces
+{{- end }}

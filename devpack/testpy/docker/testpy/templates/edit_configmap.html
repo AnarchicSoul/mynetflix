@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mt-5">Edit ConfigMap</h2>
+    <form action="/apply_configmap_changes" method="post" class="mt-4">
+        {% for key, value in configmap_data.items() %}
+            <div class="form-row mb-3">
+                <div class="col">
+                    <input type="text" class="form-control" name="keys[]" value="{{ key }}" readonly>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="values[]" value="{{ value }}">
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-danger btn-remove-key" onclick="removeKey(this)">Supprimer</button>
+                </div>
+            </div>
+        {% endfor %}
+        
+        <!-- Champs cachés pour les clés à supprimer -->
+        {% for key, value in configmap_data.items() %}
+            <input type="hidden" name="existing_keys[]" value="{{ key }}">
+        {% endfor %}
+        
+        <!-- Ajouter une nouvelle clé/valeur -->
+        <div id="new_keys"></div>
+        <button type="button" class="btn btn-success mt-3" onclick="addNewKey()">Ajouter une clé/valeur</button>
+        
+        <input type="hidden" name="configmap_name" value="{{ session['current_configmap'] }}">
+        <button type="submit" class="btn btn-primary mt-3">Apply Changes</button>
+    </form>
+</div>
+
+<script>
+function addNewKey() {
+    var newKeyDiv = document.createElement('div');
+    newKeyDiv.className = 'form-row mb-3';
+    
+    var newKeyInput = document.createElement('input');
+    newKeyInput.type = 'text';
+    newKeyInput.className = 'form-control col';
+    newKeyInput.placeholder = 'Nouvelle Clé';
+    newKeyInput.name = 'new_keys[]';
+    newKeyDiv.appendChild(newKeyInput);
+    
+    var newValueInput = document.createElement('input');
+    newValueInput.type = 'text';
+    newValueInput.className = 'form-control col';
+    newValueInput.placeholder = 'Valeur';
+    newValueInput.name = 'new_values[]';
+    newKeyDiv.appendChild(newValueInput);
+    
+    var removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'btn btn-danger btn-remove-key col';
+    removeButton.textContent = 'Supprimer';
+    removeButton.onclick = function() {
+        newKeyDiv.remove();
+    };
+    newKeyDiv.appendChild(removeButton);
+    
+    document.getElementById('new_keys').appendChild(newKeyDiv);
+}
+
+function removeKey(button) {
+    var keyToRemove = button.parentElement.parentElement.querySelector('input[name="keys[]"]').value;
+    button.parentElement.parentElement.remove();
+    var deletedKeysInput = document.createElement('input');
+    deletedKeysInput.type = 'hidden';
+    deletedKeysInput.name = 'deleted_keys[]';
+    deletedKeysInput.value = keyToRemove;
+    document.querySelector('#new_keys').appendChild(deletedKeysInput);
+}
+</script>
+{% endblock %}

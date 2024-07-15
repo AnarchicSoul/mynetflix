@@ -1,0 +1,15 @@
+{{- if .Values.testpy.roleBinding.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.testpy.roleBinding.name }}
+  namespace: {{ .Values.testpy.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.testpy.role.name }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.testpy.serviceAccount.name }}
+    namespace: {{ .Values.testpy.namespace }}
+{{- end }}

@@ -1,0 +1,17 @@
+# Utiliser une image officielle de Python comme base
+FROM python:3.9-slim
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers nécessaires
+COPY main.py .
+
+# Installer les dépendances
+RUN pip install kubernetes
+
+# Set environment variable
+ENV nsatlas=valm1
+
+# Commande pour exécuter le script Python
+CMD ["python", "main.py"]

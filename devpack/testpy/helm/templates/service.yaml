@@ -2,9 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Release.Name }}-service
+  namespace: {{ .Values.testpy.namespace }}
 spec:
   selector:
-    app: {{ .Release.Name }}-app
+    app: myapp-app  # Assurez-vous que c'est le bon label utilisé dans les pods
   ports:
     - protocol: TCP
       port: 80

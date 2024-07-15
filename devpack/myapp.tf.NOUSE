@@ -1,0 +1,266 @@
+# Namespace
+resource "kubernetes_namespace_v1" "atlas" {
+  metadata {
+    name = "valm1"
+  }
+}
+
+resource "kubernetes_namespace_v1" "secure" {
+  depends_on = [kubernetes_namespace_v1.atlas]
+  metadata {
+    name = "valm1-secure"
+  }
+}
+
+resource "kubernetes_namespace_v1" "shared" {
+  depends_on = [kubernetes_namespace_v1.atlas]
+  metadata {
+    name = "valm"
+  }
+}
+
+# Service Account
+resource "kubernetes_service_account_v1" "user" {
+  depends_on = [kubernetes_namespace_v1.atlas]
+  metadata {
+    name = "atlas-user"
+    namespace = kubernetes_namespace_v1.atlas.metadata[0].name
+  }
+}
+
+resource "kubernetes_service_account_v1" "admin-shared" {
+  depends_on = [kubernetes_namespace_v1.shared]
+  metadata {
+    name = "atlas-admin"
+    namespace = kubernetes_namespace_v1.shared.metadata[0].name
+  }
+}
+
+resource "kubernetes_service_account_v1" "admin-secure" {
+  depends_on = [kubernetes_namespace_v1.secure]
+  metadata {
+    name = "atlas-admin"
+    namespace = kubernetes_namespace_v1.secure.metadata[0].name
+  }
+}
+
+resource "kubernetes_service_account_v1" "admin-atlas" {
+  depends_on = [kubernetes_namespace_v1.atlas]
+  metadata {
+    name = "atlas-admin"
+    namespace = kubernetes_namespace_v1.atlas.metadata[0].name
+  }
+}
+
+# Cluster Role
+resource "kubernetes_cluster_role_v1" "read_only" {
+  metadata {
+    name = "atlas-read-only"
+  }
+  rule {
+    api_groups = [""]
+    resources = ["*"]
+    verbs = ["get", "list", "watch"]
+  }
+}
+
+resource "kubernetes_cluster_role_v1" "full_access" {
+  metadata {
+    name = "atlas-full-access"
+  }
+  rule {
+    api_groups = [""]
+    resources = ["*"]
+    verbs = ["*"]
+  }
+}
+
+# Role Binding
+resource "kubernetes_role_binding_v1" "ro-atlas" {
+  depends_on = [kubernetes_cluster_role_v1.read_only]
+  metadata {
+    name = "atlas-ro-binding"
+    namespace = kubernetes_namespace_v1.atlas.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind = "ClusterRole"
+    name = kubernetes_cluster_role_v1.read_only.metadata[0].name
+  }
+  subject {
+    kind = "ServiceAccount"
+    name = kubernetes_service_account_v1.user.metadata[0].name
+    namespace = kubernetes_namespace_v1.atlas.metadata[0].name
+  }
+}
+
+resource "kubernetes_role_binding_v1" "rw-atlas-atlas" {
+  depends_on = [kubernetes_cluster_role_v1.full_access]
+  metadata {
+    name = "atlas-rw-binding-atlas"
+    namespace = kubernetes_namespace_v1.atlas.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind = "ClusterRole"
+    name = kubernetes_cluster_role_v1.full_access.metadata[0].name
+  }
+  subject {
+    kind = "ServiceAccount"
+    name = kubernetes_service_account_v1.admin-atlas.metadata[0].name
+    namespace = kubernetes_namespace_v1.atlas.metadata[0].name
+  }
+}
+
+resource "kubernetes_role_binding_v1" "rw-atlas-shared" {
+  depends_on = [kubernetes_cluster_role_v1.full_access]
+  metadata {
+    name = "atlas-rw-binding-shared"
+    namespace = kubernetes_namespace_v1.shared.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind = "ClusterRole"
+    name = kubernetes_cluster_role_v1.full_access.metadata[0].name
+  }
+  subject {
+    kind = "ServiceAccount"
+    name = kubernetes_service_account_v1.admin-shared.metadata[0].name
+    namespace = kubernetes_namespace_v1.shared.metadata[0].name
+  }
+}
+
+resource "kubernetes_role_binding_v1" "rw-atlas-secure" {
+  depends_on = [kubernetes_cluster_role_v1.full_access]
+  metadata {
+    name = "atlas-rw-binding-secure"
+    namespace = kubernetes_namespace_v1.secure.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind = "ClusterRole"
+    name = kubernetes_cluster_role_v1.full_access.metadata[0].name
+  }
+  subject {
+    kind = "ServiceAccount"
+    name = kubernetes_service_account_v1.admin-secure.metadata[0].name
+    namespace = kubernetes_namespace_v1.secure.metadata[0].name
+  }
+}
+
+
+# Test Pod
+resource "kubernetes_deployment" "httpd" {
+  metadata {
+    name = "httpd-test"
+    namespace = "${kubernetes_namespace_v1.atlas.metadata[0].name}"
+  }
+  spec {
+    replicas = 1
+    selector {
+      match_labels = {
+        app = "httpd"
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = "httpd"
+        }
+      }
+      spec {
+        container {
+          name  = "httpd"
+          image = "httpd:latest"
+          env {
+            name = "NTT_DATA_PASSWORD"
+            value_from {
+              secret_key_ref {
+                name = "ntt-data-sftp"
+                key  = "password"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+# Reflector 
+resource "helm_release" "reflector" {
+  name       = "reflector"
+  namespace = "valm1"
+  repository = "https://emberstack.github.io/helm-charts"
+  chart      = "reflector"
+} 
+
+
+# my app
+resource "helm_release" "myapp" {
+  count = var.myapp ? 1 : 0
+  name       = "myapp-app"
+  namespace  = "valm1"
+  chart      = "./devpack/testpy/myapp-0.1.0.tgz"
+  values = [
+    var.keycloak ? local.myapp_noconfig : local.myapp_config
+  ]
+} 
+
+resource "helm_release" "oauth_myapp" {
+  count = var.keycloak && var.myapp ? 1 : 0
+  depends_on = [helm_release.myapp]
+  name       = "myapp"
+  namespace  = var.namespace
+  chart      = "./keycloak/oauth2/oauth2-proxy-7.7.4.tgz"
+  version    = "7.7.4"
+  values = [
+    "${file("./keycloak/oauth2/values.yaml")}",
+    local.myapp_oauth
+  ]
+} 
+
+locals {
+  myapp_config = <<-EOT
+    testpy:
+      ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/rewrite-target: /
+        hosts:
+          - host: testpy.localhost
+            paths:
+              - path: /
+                backend:
+                  serviceName: myapp-app-service
+                  servicePort: 80
+        tls:
+          - secretName: wildcard-cert
+            hosts:
+              - ${var.myapp_ingress}
+  EOT
+
+  myapp_noconfig = <<-EOT
+    testpy:
+      ingress:
+        enabled: false
+  EOT
+  
+  myapp_oauth = <<-EOT
+    ingress:
+      hosts:
+        - ${var.myapp_ingress}
+      tls: 
+        - secretName: wildcard-cert
+          hosts:
+          - ${var.myapp_ingress}
+    extraArgs:
+      client-id: myapp
+      login-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/auth" 
+      redeem-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/token"
+      profile-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo" 
+      validate-url: "https://${var.keycloak_ingress}/realms/realm1/protocol/openid-connect/userinfo"
+      upstream: "http://myapp-app-service.${kubernetes_namespace_v1.secure.metadata[0].name}.svc.cluster.local:80"
+  EOT
+}
